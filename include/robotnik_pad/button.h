@@ -15,7 +15,7 @@ public:
   }
 
   //! Set the button as 'pressed'/'released'
-  void Press(int value)
+  void press(int value)
   {
     if (is_pressed_ and !value)
     {
@@ -27,12 +27,12 @@ public:
     is_pressed_ = value;
   }
 
-  int IsPressed()
+  int isPressed()
   {
     return is_pressed_;
   }
 
-  bool IsReleased()
+  bool isReleased()
   {
     bool b = is_released_;
     is_released_ = false;
