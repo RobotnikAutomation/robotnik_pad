@@ -55,6 +55,8 @@
   <build_depend>std_srvs</build_depend>
   <build_depend>robotnik_msgs</build_depend>
   <build_depend>rcomponent</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>ackermann_msgs</build_depend>
 
   <build_export_depend>roscpp</build_export_depend>
 
@@ -64,6 +66,8 @@
   <exec_depend>std_srvs</exec_depend>
   <exec_depend>robotnik_msgs</exec_depend>
   <exec_depend>rcomponent</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>ackermann_msgs</exec_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

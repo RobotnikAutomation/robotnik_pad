@@ -5,6 +5,7 @@
 #include <ackermann_msgs/AckermannDrive.h>
 #include <geometry_msgs/Twist.h>
 #include <math.h>
+#include <robotnik_msgs/PadStatus.h>
 #include <ros/console.h>
 #include <ros/ros.h>
 #include <ros/time.h>
@@ -67,7 +68,7 @@ protected:
   // Publishers
   ros::Publisher twist_pub_;
   ros::Publisher ackermann_pub_;
-  ros::Publisher pad_data_pub_;
+  ros::Publisher pad_status_pub_;
 
   // Subscribers
   ros::Subscriber joy_sub_;
@@ -90,6 +91,9 @@ protected:
   //! Vector to save and control the axis values
   std::vector<Button> buttons_;
 
+  double current_vel_;
+  geometry_msgs::Twist cmd_twist_sent_;
+  ackermann_msgs::AckermannDrive cmd_ackermann_sent_;
 };
 
 #endif  // _ROBOTNIK_PAD_

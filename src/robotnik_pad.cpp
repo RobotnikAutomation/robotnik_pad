@@ -12,14 +12,16 @@ RobotnikPad::~RobotnikPad()
 
 int RobotnikPad::rosSetup()
 {
+  RComponent::rosSetup();
+
   // Publishers
   if (kinematic_mode_ == Ackermann)
   {
-    ackermann_pub_ = pnh_.advertise<ackermann_msgs::AckermannDrive>(cmd_ackermann_topic_vel_, 10);
+    ackermann_pub_ = nh_.advertise<ackermann_msgs::AckermannDrive>(cmd_ackermann_topic_vel_, 10);
   }
   else
   {
-    twist_pub_ = pnh_.advertise<geometry_msgs::Twist>(cmd_twist_topic_vel_, 10);
+    twist_pub_ = nh_.advertise<geometry_msgs::Twist>(cmd_twist_topic_vel_, 10);
   }
 
   pad_status_pub_ = pnh_.advertise<robotnik_msgs::PadStatus>("pad_status", 10);
@@ -61,10 +63,45 @@ void RobotnikPad::rosReadParams()
 
 void RobotnikPad::rosPublish()
 {
+  RComponent::rosPublish();
+
+  if (getState() == robotnik_msgs::State::READY_STATE)
+  {
+    // Publish velocity only when deadman button is pressed
+    if (buttons_[dead_man_button_].isPressed())
+    {
+      if (kinematic_mode_ == Ackermann)
+      {
+        ackermann_pub_.publish(cmd_ackermann_sent_);
+      }
+      else
+      {
+        twist_pub_.publish(cmd_twist_sent_);
+      }
+    }
+  }
 }
 
 void RobotnikPad::initState()
 {
+  // Initialize the buttons and axes
+  for (int i = 0; i < num_of_buttons_; i++)
+  {
+    Button b;
+    buttons_.push_back(b);
+  }
+
+  for (int i = 0; i < num_of_axes_; i++)
+  {
+    axes_.push_back(0.0);
+  }
+
+  // By default the velocity it's 10% of the maximum one
+  current_vel_ = 0.1;
+  cmd_twist_sent_ = geometry_msgs::Twist();
+  cmd_ackermann_sent_ = ackermann_msgs::AckermannDrive();
+
+  switchToState(robotnik_msgs::State::STANDBY_STATE);
 }
 
 void RobotnikPad::standbyState()
@@ -85,6 +122,10 @@ void RobotnikPad::readyState()
 
 void RobotnikPad::emergencyState()
 {
+  if (checkTopicsHealth() == true)
+  {
+    switchToState(robotnik_msgs::State::STANDBY_STATE);
+  }
 }
 
 void RobotnikPad::failureState()
@@ -102,12 +143,20 @@ void RobotnikPad::joyCb(const sensor_msgs::Joy::ConstPtr& joy)
   {
     buttons_[i].press(joy->buttons[i]);
   }
+  tickTopicsHealth("joy");
 }
 
 void RobotnikPad::fillTwistMsg(double linear_x, double linear_y, double angular_z)
 {
+  cmd_twist_sent_.linear.x = linear_x;
+  if (kinematic_mode_ == Omnidirectional)
+    cmd_twist_sent_.linear.y = linear_y;
+
+  cmd_twist_sent_.angular.z = angular_z;
 }
 
 void RobotnikPad::fillAckermannMsg(double linear_x, double angle)
 {
+  cmd_ackermann_sent_.speed = linear_x;
+  cmd_ackermann_sent_.steering_angle = angle;
 }
