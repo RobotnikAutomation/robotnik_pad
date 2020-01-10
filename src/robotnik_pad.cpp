@@ -118,6 +118,76 @@ void RobotnikPad::standbyState()
 
 void RobotnikPad::readyState()
 {
+  if (buttons_[dead_man_button_].isPressed())
+  {
+    if (buttons_[speed_down_button_].isReleased())
+    {
+      if (current_vel_ > 0.1)
+      {
+        current_vel_ -= 0.1;
+        ROS_INFO("Velocity: %f%%", current_vel_ * 100.0);
+      }
+    }
+    if (buttons_[speed_up_button_].isReleased())
+    {
+      if (current_vel_ < 0.9)
+      {
+        current_vel_ += 0.1;
+        ROS_INFO("Velocity: %f%%", current_vel_ * 100.0);
+      }
+    }
+
+    if (buttons_[button_kinematic_mode_].isReleased())
+    {
+      if (kinematic_mode_ == Ackermann)
+      {
+        ROS_WARN("In ackermann mode it is not possible to change the kinematics");
+      }
+      else
+      {
+        if (kinematic_mode_ == Differential)
+        {
+          kinematic_mode_ = Omnidirectional;
+        }
+        else if (kinematic_mode_ == Omnidirectional)
+        {
+          kinematic_mode_ = Differential;
+        }
+
+        ROS_INFO("Kinematic mode changed to %d", kinematic_mode_);
+      }
+    }
+
+    if (kinematic_mode_ == Ackermann)
+    {
+      double linear_x = current_vel_ * l_scale_ * axes_[axis_linear_x_];
+      double angle = a_scale_ * axes_[axis_angular_z_];
+
+      fillAckermannMsg(linear_x, angle);
+    }
+    else
+    {
+      double linear_x = current_vel_ * l_scale_ * axes_[axis_linear_x_];
+      double linear_y = current_vel_ * l_scale_ * axes_[axis_linear_y_];
+      double angular_z = current_vel_ * a_scale_ * axes_[axis_angular_z_];
+
+      fillTwistMsg(linear_x, linear_y, angular_z);
+    }
+  }
+  else if (buttons_[dead_man_button_].isReleased())
+  {
+    if (kinematic_mode_ == Ackermann)
+    {
+      // TODO: For ackermann robot, should be the angle 0?
+      fillAckermannMsg(0.0, 0.0);
+      ackermann_pub_.publish(cmd_ackermann_sent_);
+    }
+    else
+    {
+      fillTwistMsg(0.0, 0.0, 0.0);
+      twist_pub_.publish(cmd_twist_sent_);
+    }
+  }
 }
 
 void RobotnikPad::emergencyState()
