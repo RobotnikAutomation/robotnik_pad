@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="debug" default="false"/>
+    <arg if="$(arg debug)" name="launch_prefix" default="gdb -ex run --args"/>
+    <arg unless="$(arg debug)" name="launch_prefix" default=""/>
+
+    <arg name="joy_dev" default="/dev/input/js_base"/>
+    <arg name="autorepeat_rate" default="0.0"/>
+    <arg name="pad_model" default="ps4"/>
+    <arg name="cmd_twist_topic_vel" default="pad_teleop/cmd_vel"/>
+    <arg name="cmd_ackermann_topic_vel" default="pad_teleop/ack_vel"/>
+
+    <!-- joy node -->
+    <node pkg="joy" type="joy_node" name="joy" output="screen" respawn="true">
+        <param name="dev" type="string" value="$(arg joy_dev)" />
+        <param name="deadzone" value="0.12" />
+        <param name="autorepeat_rate" value="10.0" type="double" />
+    </node>
+
+    <!-- Parameters -->
+    <node name="robotnik_pad" pkg="robotnik_pad" type="robotnik_pad_node" output="screen" launch-prefix="$(arg launch_prefix)">
+        <param name="cmd_twist_topic_vel" value="$(arg cmd_twist_topic_vel)" type="string"/>
+        <param name="cmd_ackermann_topic_vel" value="$(arg cmd_ackermann_topic_vel)" type="string"/>
+        <rosparam command="load" file="$(find robotnik_pad)/config/$(arg pad_model).yaml" />
+        <rosparam command="load" file="$(find robotnik_pad)/config/robotnik_pad_plugins.yaml" />
+    </node>
+
+</launch>
+

@@ -1,0 +1,13 @@
+pad_type: ps4
+num_of_buttons: 14
+num_of_axes: 14 
+#axis_linear_x: 1
+#axis_linear_y: 0
+#axis_angular_z: 2
+#scale_linear: 1.5
+#scale_angular: 3
+#button_speed_up: 3
+#button_speed_down: 1
+#button_dead_man: 5
+#button_kinematic_mode: 7
+#kinematic_mode: 0
