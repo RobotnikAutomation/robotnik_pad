@@ -15,15 +15,6 @@ int RobotnikPad::rosSetup()
   RComponent::rosSetup();
 
   // Publishers
-  if (kinematic_mode_ == Ackermann)
-  {
-    ackermann_pub_ = nh_.advertise<ackermann_msgs::AckermannDrive>(cmd_ackermann_topic_vel_, 10);
-  }
-  else
-  {
-    twist_pub_ = nh_.advertise<geometry_msgs::Twist>(cmd_twist_topic_vel_, 10);
-  }
-
   pad_status_pub_ = pnh_.advertise<robotnik_msgs::PadStatus>("pad_status", 10);
 
   joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &RobotnikPad::joyCb, this);
@@ -41,24 +32,18 @@ void RobotnikPad::rosReadParams()
   bool not_required = false;
 
   // JOYSTICK PAD TYPE
-  readParam(pnh_, "num_of_buttons", num_of_buttons_, DEFAULT_NUM_OF_BUTTONS, required);
-  readParam(pnh_, "num_of_axes", num_of_axes_, DEFAULT_NUM_OF_AXES, required);
+  readParam(pnh_, "num_of_buttons", num_of_buttons_, num_of_buttons_, required);
+  readParam(pnh_, "num_of_axes", num_of_axes_, num_of_axes_, required);
   readParam(pnh_, "pad_type", pad_type_, "ps4", required);
 
-  readParam(pnh_, "axis_linear_x", axis_linear_x_, DEFAULT_AXIS_LINEAR_X, required);
-  readParam(pnh_, "axis_linear_y", axis_linear_y_, DEFAULT_AXIS_LINEAR_Y, required);
-  readParam(pnh_, "axis_angular_z", axis_angular_z_, DEFAULT_AXIS_ANGULAR, required);
-  readParam(pnh_, "scale_angular", a_scale_, DEFAULT_SCALE_ANGULAR, required);
-  readParam(pnh_, "scale_linear", l_scale_, DEFAULT_SCALE_LINEAR, required);
-  readParam(pnh_, "cmd_twist_topic_vel", cmd_twist_topic_vel_, cmd_twist_topic_vel_, required);
-  readParam(pnh_, "cmd_ackermann_topic_vel", cmd_ackermann_topic_vel_, cmd_ackermann_topic_vel_, required);
-  readParam(pnh_, "button_dead_man", dead_man_button_, dead_man_button_, required);
-  readParam(pnh_, "button_speed_up", speed_up_button_, speed_up_button_, required);
-  readParam(pnh_, "button_speed_down", speed_down_button_, speed_down_button_, required);
+  std::vector<std::string> plugins_names;
 
-  // KINEMATIC MODE
-  readParam(pnh_, "kinematic_mode", kinematic_mode_, kinematic_mode_, required);
-  readParam(pnh_, "button_kinematic_mode", button_kinematic_mode_, button_kinematic_mode_, required);
+  readParam(pnh_, "plugins", plugins_names, plugins_names);
+  readPluginsFromParams(pnh_, plugins_names, plugins_from_params_);
+}
+
+int RobotnikPad::setup()
+{
 }
 
 void RobotnikPad::rosPublish()
@@ -67,18 +52,6 @@ void RobotnikPad::rosPublish()
 
   if (getState() == robotnik_msgs::State::READY_STATE)
   {
-    // Publish velocity only when deadman button is pressed
-    if (buttons_[dead_man_button_].isPressed())
-    {
-      if (kinematic_mode_ == Ackermann)
-      {
-        ackermann_pub_.publish(cmd_ackermann_sent_);
-      }
-      else
-      {
-        twist_pub_.publish(cmd_twist_sent_);
-      }
-    }
   }
 }
 
@@ -96,10 +69,24 @@ void RobotnikPad::initState()
     axes_.push_back(0.0);
   }
 
-  // By default the velocity it's 10% of the maximum one
-  current_vel_ = 0.1;
-  cmd_twist_sent_ = geometry_msgs::Twist();
-  cmd_ackermann_sent_ = ackermann_msgs::AckermannDrive();
+  pad_plugins_loader_ =
+      new pluginlib::ClassLoader<pad_plugins::GenericPadPlugin>("robotnik_pad", "pad_plugins::GenericPadPlugin");
+
+  for (auto& plugin : plugins_from_params_)
+  {
+    try
+    {
+      plugin_ = pad_plugins_loader_->createInstance(plugin.second);
+    }
+    catch (pluginlib::PluginlibException& ex)
+    {
+      RCOMPONENT_ERROR_STREAM("Failed to load plugin " << plugin.first << "\" of type \"" << plugin.second << "."
+                                                       << std::endl
+                                                       << "Exception: " << ex.what());
+      continue;
+    }
+    plugin_->initialize(pnh_, plugin.first);
+  }
 
   switchToState(robotnik_msgs::State::STANDBY_STATE);
 }
@@ -118,76 +105,7 @@ void RobotnikPad::standbyState()
 
 void RobotnikPad::readyState()
 {
-  if (buttons_[dead_man_button_].isPressed())
-  {
-    if (buttons_[speed_down_button_].isReleased())
-    {
-      if (current_vel_ > 0.1)
-      {
-        current_vel_ -= 0.1;
-        ROS_INFO("Velocity: %f%%", current_vel_ * 100.0);
-      }
-    }
-    if (buttons_[speed_up_button_].isReleased())
-    {
-      if (current_vel_ < 0.9)
-      {
-        current_vel_ += 0.1;
-        ROS_INFO("Velocity: %f%%", current_vel_ * 100.0);
-      }
-    }
-
-    if (buttons_[button_kinematic_mode_].isReleased())
-    {
-      if (kinematic_mode_ == Ackermann)
-      {
-        ROS_WARN("In ackermann mode it is not possible to change the kinematics");
-      }
-      else
-      {
-        if (kinematic_mode_ == Differential)
-        {
-          kinematic_mode_ = Omnidirectional;
-        }
-        else if (kinematic_mode_ == Omnidirectional)
-        {
-          kinematic_mode_ = Differential;
-        }
-
-        ROS_INFO("Kinematic mode changed to %d", kinematic_mode_);
-      }
-    }
-
-    if (kinematic_mode_ == Ackermann)
-    {
-      double linear_x = current_vel_ * l_scale_ * axes_[axis_linear_x_];
-      double angle = a_scale_ * axes_[axis_angular_z_];
-
-      fillAckermannMsg(linear_x, angle);
-    }
-    else
-    {
-      double linear_x = current_vel_ * l_scale_ * axes_[axis_linear_x_];
-      double linear_y = current_vel_ * l_scale_ * axes_[axis_linear_y_];
-      double angular_z = current_vel_ * a_scale_ * axes_[axis_angular_z_];
-
-      fillTwistMsg(linear_x, linear_y, angular_z);
-    }
-  }
-  else if (buttons_[dead_man_button_].isReleased())
-  {
-    if (kinematic_mode_ == Ackermann)
-    {
-      // TODO: For ackermann robot, should be the angle 0?
-      fillAckermannMsg(0.0, 0.0);
-      ackermann_pub_.publish(cmd_ackermann_sent_);
-    }
-    else
-    {
-      fillTwistMsg(0.0, 0.0, 0.0);
-      twist_pub_.publish(cmd_twist_sent_);
-    }
-  }
+  plugin_->execute(buttons_, axes_);
 }
 
 void RobotnikPad::emergencyState()
@@ -216,17 +134,38 @@ void RobotnikPad::joyCb(const sensor_msgs::Joy::ConstPtr& joy)
   tickTopicsHealth("joy");
 }
 
-void RobotnikPad::fillTwistMsg(double linear_x, double linear_y, double angular_z)
+void RobotnikPad::readPluginsFromParams(const ros::NodeHandle& nh, const std::vector<std::string>& names,
+                                        std::map<std::string, std::string>& plugins_definitions)
 {
-  cmd_twist_sent_.linear.x = linear_x;
-  if (kinematic_mode_ == Omnidirectional)
-    cmd_twist_sent_.linear.y = linear_y;
+  plugins_definitions.clear();
 
-  cmd_twist_sent_.angular.z = angular_z;
-}
+  for (const std::string& name : names)
+  {
+    if (nh.hasParam(name) == false)
+    {
+      RCOMPONENT_WARN_STREAM("Cannot load component " << name << " because it doesn't exist in the parameter tree");
+      continue;
+    }
 
-void RobotnikPad::fillAckermannMsg(double linear_x, double angle)
-{
-  cmd_ackermann_sent_.speed = linear_x;
-  cmd_ackermann_sent_.steering_angle = angle;
+    std::string type = "";
+    bool required = true;
+    bool ok = false;
+
+    ok = readParam(nh, name + "/type", type, type, required);
+
+    if (ok == false)
+    {
+      RCOMPONENT_WARN_STREAM("Cannot load component " << name << " because its type is empty");
+      continue;
+    }
+    if (plugins_definitions.count(name) != 0)
+    {
+      RCOMPONENT_WARN_STREAM("Already loaded component with name " << name << " of type " << type);
+    }
+    plugins_definitions[name] = type;
+  }
+
+  RCOMPONENT_INFO_STREAM("I have read " << plugins_definitions.size() << " components:");
+  for (auto& x : plugins_definitions)
+    RCOMPONENT_INFO_STREAM(x.first << ": " << x.second);
 }

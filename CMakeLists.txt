@@ -14,12 +14,13 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   geometry_msgs
   ackermann_msgs
+  pluginlib
 )
 
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES robotnik_pad
-  CATKIN_DEPENDS roscpp rcomponent robotnik_msgs sensor_msgs geometry_msgs ackermann_msgs
+  CATKIN_DEPENDS roscpp rcomponent robotnik_msgs sensor_msgs geometry_msgs ackermann_msgs pluginlib
 #  DEPENDS system_lib
 )
 
