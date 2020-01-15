@@ -55,6 +55,7 @@ protected:
   std::vector<Button> buttons_;
   std::vector<float> axes_;
   ros::NodeHandle pnh_;
+  ros::NodeHandle nh_;
 };
 }
 #endif  // GENERIC_PAD_PLUGIN_H_

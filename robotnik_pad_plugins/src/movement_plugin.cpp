@@ -14,6 +14,7 @@ void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string&
 {
   bool required = true;
   pnh_ = ros::NodeHandle(nh, plugin_ns);
+  nh_ = nh;
 
   readParam(pnh_, "config/deadman", button_dead_man_, button_dead_man_, required);
   readParam(pnh_, "config/linear_x", axis_linear_x_, axis_linear_x_, required);
@@ -27,7 +28,7 @@ void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string&
   readParam(pnh_, "cmd_topic_vel", cmd_topic_vel_, cmd_topic_vel_, required);
 
   // Publishers
-  twist_pub_ = pnh_.advertise<geometry_msgs::Twist>("cmd_vel", 10);
+  twist_pub_ = nh_.advertise<geometry_msgs::Twist>(cmd_topic_vel_, 10);
 
   // initialize variables
   current_vel_ = 0.1;
@@ -69,7 +70,7 @@ void PadPluginMovement::execute(std::vector<Button>& buttons, std::vector<float>
     }
 
     cmd_twist_.linear.x = current_vel_ * scale_linear_ * axes[axis_linear_x_];
-    cmd_twist_.angular.z = scale_angular_ * axes[axis_angular_z_];
+    cmd_twist_.angular.z = current_vel_ * scale_angular_ * axes[axis_angular_z_];
 
     if (kinematic_mode_ == Omnidirectional)
     {

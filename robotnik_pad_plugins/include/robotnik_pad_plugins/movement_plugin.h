@@ -26,6 +26,7 @@ protected:
   int button_dead_man_, axis_linear_x_, axis_linear_y_, axis_angular_z_, button_kinematic_mode_;
   int button_speed_up_, button_speed_down_;
   double scale_linear_, scale_angular_;
+  std::string cmd_topic_vel_;
 
   ros::Publisher twist_pub_;
   double current_vel_;
