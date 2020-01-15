@@ -53,9 +53,6 @@ public:
 protected:
   /* ROS stuff */
 
-  // Publishers
-  ros::Publisher pad_status_pub_;
-
   // Subscribers
   ros::Subscriber joy_sub_;
 

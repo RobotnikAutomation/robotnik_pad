@@ -14,9 +14,6 @@ int RobotnikPad::rosSetup()
 {
   RComponent::rosSetup();
 
-  // Publishers
-  pad_status_pub_ = pnh_.advertise<robotnik_msgs::PadStatus>("pad_status", 10);
-
   joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &RobotnikPad::joyCb, this);
   addTopicsHealth(&joy_sub_, "joy", 5);
 }
@@ -49,10 +46,6 @@ int RobotnikPad::setup()
 void RobotnikPad::rosPublish()
 {
   RComponent::rosPublish();
-
-  if (getState() == robotnik_msgs::State::READY_STATE)
-  {
-  }
 }
 
 void RobotnikPad::initState()
