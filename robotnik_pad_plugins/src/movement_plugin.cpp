@@ -19,11 +19,12 @@ void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string&
   readParam(pnh_, "config/linear_x", axis_linear_x_, axis_linear_x_, required);
   readParam(pnh_, "config/linear_y", axis_linear_y_, axis_linear_y_, required);
   readParam(pnh_, "config/angular_z", axis_angular_z_, axis_angular_z_, required);
-  readParam(pnh_, "config/scale_linear", scale_linear_, scale_linear_, required);
-  readParam(pnh_, "config/scale_angular", scale_angular_, scale_angular_, required);
   readParam(pnh_, "config/button_kinematic_mode", button_kinematic_mode_, button_kinematic_mode_, required);
   readParam(pnh_, "config/button_speed_up", button_speed_up_, button_speed_up_, required);
   readParam(pnh_, "config/button_speed_down", button_speed_down_, button_speed_down_, required);
+  readParam(pnh_, "scale_linear", scale_linear_, scale_linear_, required);
+  readParam(pnh_, "scale_angular", scale_angular_, scale_angular_, required);
+  readParam(pnh_, "cmd_topic_vel", cmd_topic_vel_, cmd_topic_vel_, required);
 
   // Publishers
   twist_pub_ = pnh_.advertise<geometry_msgs::Twist>("cmd_vel", 10);
