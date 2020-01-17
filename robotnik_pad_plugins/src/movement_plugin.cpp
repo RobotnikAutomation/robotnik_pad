@@ -29,10 +29,12 @@ void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string&
 
   // Publishers
   twist_pub_ = nh_.advertise<geometry_msgs::Twist>(cmd_topic_vel_, 10);
+  pad_status_pub_ = pnh_.advertise<robotnik_pad_msgs::MovementStatus>("status", 10);
 
   // initialize variables
   current_vel_ = 0.1;
   cmd_twist_ = geometry_msgs::Twist();
+  movement_status_msg_ = robotnik_pad_msgs::MovementStatus();
   kinematic_mode_ = 0;
 }
 
@@ -90,6 +92,23 @@ void PadPluginMovement::execute(std::vector<Button>& buttons, std::vector<float>
     cmd_twist_.angular.z = 0.0;
 
     twist_pub_.publish(cmd_twist_);
+  }
+
+  movement_status_msg_.velocity_level = current_vel_ * 100;
+  movement_status_msg_.kinematic_mode = kinematicModeToStr(kinematic_mode_);
+  pad_status_pub_.publish(movement_status_msg_);
+}
+
+std::string PadPluginMovement::kinematicModeToStr(int kinematic_mode)
+{
+  switch (kinematic_mode)
+  {
+    case Omnidirectional:
+      return "omni";
+    case Differential:
+      return "differential";
+    default:
+      return "Unknown";
   }
 }
 }  // namespace

@@ -3,6 +3,7 @@
 
 #include <geometry_msgs/Twist.h>
 #include <robotnik_pad/generic_pad_plugin.h>
+#include <robotnik_pad_msgs/MovementStatus.h>
 
 namespace pad_plugins
 {
@@ -28,10 +29,16 @@ protected:
   double scale_linear_, scale_angular_;
   std::string cmd_topic_vel_;
 
-  ros::Publisher twist_pub_;
+  ros::Publisher twist_pub_, pad_status_pub_;
+
+  robotnik_pad_msgs::MovementStatus movement_status_msg_;
+
   double current_vel_;
   geometry_msgs::Twist cmd_twist_;
   int kinematic_mode_;
+
+protected:
+  std::string kinematicModeToStr(int kinematic_mode);
 };
 }  // namespace
 #endif  // PAD_PLUGIN_ELEVATOR_H_
