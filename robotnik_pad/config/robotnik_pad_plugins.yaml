@@ -5,7 +5,7 @@ Movement:
   type: robotnik_pad_plugins/Movement
   scale_linear: 1.5
   scale_angular: 3
-  cmd_topic_vel: pad_teleop/cmd_vel
+  cmd_topic_vel: cmd_vel
   config: 
     deadman: 5
     linear_x: 1
