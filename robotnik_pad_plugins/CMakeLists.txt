@@ -11,13 +11,14 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   pluginlib
   robotnik_pad
+  robotnik_pad_msgs
 )
 
 
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES robotnik_pad_plugins
-  CATKIN_DEPENDS roscpp pluginlib robotnik_pad
+  CATKIN_DEPENDS roscpp pluginlib robotnik_pad robotnik_pad_msgs
 #  DEPENDS system_lib
 )
 
