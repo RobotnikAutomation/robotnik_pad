@@ -98,7 +98,17 @@ void RobotnikPad::standbyState()
 
 void RobotnikPad::readyState()
 {
-  plugin_->execute(buttons_, axes_);
+  // If joyCb is not publishing then we change the state to emergency
+  if (checkTopicsHealth() == false)
+  {
+    switchToState(robotnik_msgs::State::EMERGENCY_STATE);
+  }
+
+  // Call every plugin
+  for (auto& plugin : plugins_from_params_)
+  {
+    plugin_->execute(buttons_, axes_);
+  }
 }
 
 void RobotnikPad::emergencyState()
