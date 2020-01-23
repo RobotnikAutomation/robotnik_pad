@@ -1,4 +1,4 @@
-# Robotnik Pad
+# robotnik_pad
 
 This package is intended to be used as a standard pad for all Robotnik robots. 
 
@@ -23,7 +23,7 @@ rosdep install --from-path src --ignore-src -y -r
 ```
 ---
 ## Node Description
-The robotnik_pad_node loads plugins that specify the desired behaviour. This allows you to load different plugins depending on your needs. Besides, it is possible to create your own plugins.
+The `robotnik_pad_node` loads plugins that specify the desired behaviour. This allows you to load different plugins depending on your needs. Besides, it is possible to create your own plugins.
 
 ### How To Launch it
 ```bash
@@ -45,12 +45,12 @@ TwistMovement:
   type: robotnik_pad_plugins/Movement
   scale_linear: 1.5
   scale_angular: 3
-  cmd_topic_vel: pad_teleop/cmd_vel
+  cmd_topic_vel: cmd_vel
   config: 
-    deadman: 5
-    linear_x: 1
-    linear_y: 0
-    angular_z: 2
+    button_deadman: 5
+    axis_linear_x: 1
+    axis_linear_y: 0
+    axis_angular_z: 2
     button_speed_up: 3
     button_speed_down: 1
     button_kinematic_mode: 7
