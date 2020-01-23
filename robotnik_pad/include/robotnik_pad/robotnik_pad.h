@@ -3,7 +3,7 @@
 #define _ROBOTNIK_PAD_
 
 #include <math.h>
-#include <robotnik_msgs/PadStatus.h>
+
 #include <ros/console.h>
 #include <ros/ros.h>
 #include <ros/time.h>
