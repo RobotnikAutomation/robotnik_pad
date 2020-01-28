@@ -16,10 +16,10 @@ void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string&
   pnh_ = ros::NodeHandle(nh, plugin_ns);
   nh_ = nh;
 
-  readParam(pnh_, "config/deadman", button_dead_man_, button_dead_man_, required);
-  readParam(pnh_, "config/linear_x", axis_linear_x_, axis_linear_x_, required);
-  readParam(pnh_, "config/linear_y", axis_linear_y_, axis_linear_y_, required);
-  readParam(pnh_, "config/angular_z", axis_angular_z_, axis_angular_z_, required);
+  readParam(pnh_, "config/button_deadman", button_dead_man_, button_dead_man_, required);
+  readParam(pnh_, "config/axis_linear_x", axis_linear_x_, axis_linear_x_, required);
+  readParam(pnh_, "config/axis_linear_y", axis_linear_y_, axis_linear_y_, required);
+  readParam(pnh_, "config/axis_angular_z", axis_angular_z_, axis_angular_z_, required);
   readParam(pnh_, "config/button_kinematic_mode", button_kinematic_mode_, button_kinematic_mode_, required);
   readParam(pnh_, "config/button_speed_up", button_speed_up_, button_speed_up_, required);
   readParam(pnh_, "config/button_speed_down", button_speed_down_, button_speed_down_, required);
@@ -35,7 +35,7 @@ void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string&
   current_vel_ = 0.1;
   cmd_twist_ = geometry_msgs::Twist();
   movement_status_msg_ = robotnik_pad_msgs::MovementStatus();
-  kinematic_mode_ = 0;
+  kinematic_mode_ = Differential;
 }
 
 void PadPluginMovement::execute(std::vector<Button>& buttons, std::vector<float>& axes)
