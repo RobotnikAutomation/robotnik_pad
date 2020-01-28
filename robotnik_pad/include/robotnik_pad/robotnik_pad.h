@@ -45,9 +45,9 @@ protected:
   virtual void failureState();
 
   //! joy callback
-  void joyCb(const sensor_msgs::Joy::ConstPtr& joy);
-  void readPluginsFromParams(const ros::NodeHandle& nh, const std::vector<std::string>& names,
-                             std::map<std::string, std::string>& plugins_definitions);
+  void joyCb(const sensor_msgs::Joy::ConstPtr &joy);
+  void readPluginsFromParams(const ros::NodeHandle &nh, const std::vector<std::string> &names,
+                             std::map<std::string, std::string> &plugins_definitions);
 
 public:
 protected:
@@ -67,10 +67,10 @@ protected:
   //! Vector to save and control the axis values
   std::vector<Button> buttons_;
 
-  pluginlib::ClassLoader<pad_plugins::GenericPadPlugin>* pad_plugins_loader_;
-  pad_plugins::GenericPadPlugin::Ptr plugin_;
+  pluginlib::ClassLoader<pad_plugins::GenericPadPlugin> *pad_plugins_loader_;
+  std::vector<pad_plugins::GenericPadPlugin::Ptr> plugins_;
 
   std::map<std::string, std::string> plugins_from_params_;
 };
 
-#endif  // _ROBOTNIK_PAD_
+#endif // _ROBOTNIK_PAD_

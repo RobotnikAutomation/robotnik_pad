@@ -65,20 +65,22 @@ void RobotnikPad::initState()
   pad_plugins_loader_ =
       new pluginlib::ClassLoader<pad_plugins::GenericPadPlugin>("robotnik_pad", "pad_plugins::GenericPadPlugin");
 
-  for (auto& plugin : plugins_from_params_)
+  for (auto &param_plugin : plugins_from_params_)
   {
+    pad_plugins::GenericPadPlugin::Ptr plugin;
     try
     {
-      plugin_ = pad_plugins_loader_->createInstance(plugin.second);
+      plugin = pad_plugins_loader_->createInstance(param_plugin.second);
     }
-    catch (pluginlib::PluginlibException& ex)
+    catch (pluginlib::PluginlibException &ex)
     {
-      RCOMPONENT_ERROR_STREAM("Failed to load plugin " << plugin.first << "\" of type \"" << plugin.second << "."
+      RCOMPONENT_ERROR_STREAM("Failed to load plugin " << param_plugin.first << "\" of type \"" << param_plugin.second << "."
                                                        << std::endl
                                                        << "Exception: " << ex.what());
       continue;
     }
-    plugin_->initialize(pnh_, plugin.first);
+    plugin->initialize(pnh_, param_plugin.first);
+    plugins_.push_back(plugin);
   }
 
   switchToState(robotnik_msgs::State::STANDBY_STATE);
@@ -105,9 +107,9 @@ void RobotnikPad::readyState()
   }
 
   // Call every plugin
-  for (auto& plugin : plugins_from_params_)
+  for (auto &plugin : plugins_)
   {
-    plugin_->execute(buttons_, axes_);
+    plugin->execute(buttons_, axes_);
   }
 }
 
@@ -123,7 +125,7 @@ void RobotnikPad::failureState()
 {
 }
 
-void RobotnikPad::joyCb(const sensor_msgs::Joy::ConstPtr& joy)
+void RobotnikPad::joyCb(const sensor_msgs::Joy::ConstPtr &joy)
 {
   // Fill in the axes and buttons arrays
   for (int i = 0; i < joy->axes.size(); i++)
@@ -137,12 +139,12 @@ void RobotnikPad::joyCb(const sensor_msgs::Joy::ConstPtr& joy)
   tickTopicsHealth("joy");
 }
 
-void RobotnikPad::readPluginsFromParams(const ros::NodeHandle& nh, const std::vector<std::string>& names,
-                                        std::map<std::string, std::string>& plugins_definitions)
+void RobotnikPad::readPluginsFromParams(const ros::NodeHandle &nh, const std::vector<std::string> &names,
+                                        std::map<std::string, std::string> &plugins_definitions)
 {
   plugins_definitions.clear();
 
-  for (const std::string& name : names)
+  for (const std::string &name : names)
   {
     if (nh.hasParam(name) == false)
     {
@@ -169,6 +171,6 @@ void RobotnikPad::readPluginsFromParams(const ros::NodeHandle& nh, const std::ve
   }
 
   RCOMPONENT_INFO_STREAM("I have read " << plugins_definitions.size() << " components:");
-  for (auto& x : plugins_definitions)
+  for (auto &x : plugins_definitions)
     RCOMPONENT_INFO_STREAM(x.first << ": " << x.second);
 }
