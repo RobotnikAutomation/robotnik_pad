@@ -2,4 +2,7 @@
     <class name="robotnik_pad_plugins/Movement" type="pad_plugins::PadPluginMovement" base_class_type="pad_plugins::GenericPadPlugin">
         <description>This is the Pad movement plugin.</description>
     </class>
+    <class name="robotnik_pad_plugins/Elevator" type="pad_plugins::PadPluginElevator" base_class_type="pad_plugins::GenericPadPlugin">
+        <description>This is the Pad elevator plugin.</description>
+    </class>
 </library>

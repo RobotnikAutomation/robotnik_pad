@@ -1,5 +1,6 @@
 plugins: 
   - Movement
+  - Elevator
 
 Movement:
   type: robotnik_pad_plugins/Movement
@@ -15,3 +16,9 @@ Movement:
     button_speed_down: 1
     button_kinematic_mode: 7
 
+Elevator:
+  type: robotnik_pad_plugins/Elevator
+  elevator_service_name: robotnik_base_control/set_elevator
+  config: 
+    deadman: 5 
+    axis_elevator: 10
