@@ -2,5 +2,7 @@
 
 #include <robotnik_pad/generic_pad_plugin.h>
 #include <robotnik_pad_plugins/movement_plugin.h>
+#include <robotnik_pad_plugins/elevator_plugin.h>
 
 PLUGINLIB_EXPORT_CLASS(pad_plugins::PadPluginMovement, pad_plugins::GenericPadPlugin);
+PLUGINLIB_EXPORT_CLASS(pad_plugins::PadPluginElevator, pad_plugins::GenericPadPlugin);
