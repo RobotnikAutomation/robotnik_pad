@@ -1,13 +1,18 @@
-plugins: 
+plugins:
   - Movement
   - Elevator
 
+pad:
+  type: ps4
+  num_of_buttons: 14
+  num_of_axes: 14
+
 Movement:
   type: robotnik_pad_plugins/Movement
-  scale_linear: 1.5
-  scale_angular: 3
+  max_linear_speed: 1.5
+  max_angular_speed: 3
   cmd_topic_vel: cmd_vel
-  config: 
+  config:
     button_deadman: 5
     axis_linear_x: 1
     axis_linear_y: 0
@@ -19,6 +24,6 @@ Movement:
 Elevator:
   type: robotnik_pad_plugins/Elevator
   elevator_service_name: robotnik_base_control/set_elevator
-  config: 
-    deadman: 5 
+  config:
+    deadman: 5
     axis_elevator: 10
