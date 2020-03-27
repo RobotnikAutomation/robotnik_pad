@@ -14,7 +14,7 @@ void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string&
 {
   bool required = true;
   pnh_ = ros::NodeHandle(nh, plugin_ns);
-  nh_ = nh;
+  nh_ = ros::NodeHandle();
   button_dead_man_ = 5;
   readParam(pnh_, "config/button_deadman", button_dead_man_, button_dead_man_, required);
   axis_linear_x_ = 1;
