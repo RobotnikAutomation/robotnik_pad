@@ -14,17 +14,26 @@ void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string&
 {
   bool required = true;
   pnh_ = ros::NodeHandle(nh, plugin_ns);
-  nh_ = nh;
-
+  nh_ = ros::NodeHandle();
+  button_dead_man_ = 5;
   readParam(pnh_, "config/button_deadman", button_dead_man_, button_dead_man_, required);
+  axis_linear_x_ = 1;
   readParam(pnh_, "config/axis_linear_x", axis_linear_x_, axis_linear_x_, required);
+  axis_linear_y_ = 0;
   readParam(pnh_, "config/axis_linear_y", axis_linear_y_, axis_linear_y_, required);
+  axis_angular_z_ = 2;
   readParam(pnh_, "config/axis_angular_z", axis_angular_z_, axis_angular_z_, required);
+  button_kinematic_mode_ = 7;
   readParam(pnh_, "config/button_kinematic_mode", button_kinematic_mode_, button_kinematic_mode_, required);
+  button_speed_up_ = 3;
   readParam(pnh_, "config/button_speed_up", button_speed_up_, button_speed_up_, required);
+  button_speed_down_ = 1;
   readParam(pnh_, "config/button_speed_down", button_speed_down_, button_speed_down_, required);
-  readParam(pnh_, "scale_linear", scale_linear_, scale_linear_, required);
-  readParam(pnh_, "scale_angular", scale_angular_, scale_angular_, required);
+  max_linear_speed_ = 1.5;
+  readParam(pnh_, "max_linear_speed", max_linear_speed_, max_linear_speed_, required);
+  max_angular_speed_ = 3.0;
+  readParam(pnh_, "max_angular_speed", max_angular_speed_, max_angular_speed_, required);
+  cmd_topic_vel_ = "cmd_vel";
   readParam(pnh_, "cmd_topic_vel", cmd_topic_vel_, cmd_topic_vel_, required);
 
   // Publishers
@@ -32,7 +41,10 @@ void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string&
   pad_status_pub_ = pnh_.advertise<robotnik_pad_msgs::MovementStatus>("status", 10);
 
   // initialize variables
-  current_vel_ = 0.1;
+  current_velocity_level_ = 0.1;
+  velocity_level_step_ = 0.1;
+  max_velocity_level_ = 1.0;
+  min_velocity_level_ = 0.1;
   cmd_twist_ = geometry_msgs::Twist();
   movement_status_msg_ = robotnik_pad_msgs::MovementStatus();
   kinematic_mode_ = Differential;
@@ -44,19 +56,13 @@ void PadPluginMovement::execute(std::vector<Button>& buttons, std::vector<float>
   {
     if (buttons[button_speed_down_].isReleased())
     {
-      if (current_vel_ > 0.1)
-      {
-        current_vel_ -= 0.1;
-        ROS_INFO("Velocity: %f%%", current_vel_ * 100.0);
-      }
+      current_velocity_level_ = std::max(min_velocity_level_, current_velocity_level_ - velocity_level_step_);
+      ROS_INFO("PadPluginMovement::execute: speed down -> velocity level = %.1f%%", current_velocity_level_ * 100.0);
     }
-    if (buttons[button_speed_up_].isReleased())
+    else if (buttons[button_speed_up_].isReleased())
     {
-      if (current_vel_ < 0.9)
-      {
-        current_vel_ += 0.1;
-        ROS_INFO("Velocity: %f%%", current_vel_ * 100.0);
-      }
+      current_velocity_level_ = std::min(max_velocity_level_, current_velocity_level_ + velocity_level_step_);
+      ROS_INFO("PadPluginMovement::execute: speed up -> velocity level = %.1f%%", current_velocity_level_ * 100.0);
     }
 
     if (buttons[button_kinematic_mode_].isReleased())
@@ -71,12 +77,12 @@ void PadPluginMovement::execute(std::vector<Button>& buttons, std::vector<float>
       }
     }
 
-    cmd_twist_.linear.x = current_vel_ * scale_linear_ * axes[axis_linear_x_];
-    cmd_twist_.angular.z = current_vel_ * scale_angular_ * axes[axis_angular_z_];
+    cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_];
+    cmd_twist_.angular.z = current_velocity_level_ * max_angular_speed_ * axes[axis_angular_z_];
 
     if (kinematic_mode_ == Omnidirectional)
     {
-      cmd_twist_.linear.y = current_vel_ * scale_linear_ * axes[axis_linear_y_];
+      cmd_twist_.linear.y = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_y_];
     }
     else
     {
@@ -94,7 +100,7 @@ void PadPluginMovement::execute(std::vector<Button>& buttons, std::vector<float>
     twist_pub_.publish(cmd_twist_);
   }
 
-  movement_status_msg_.velocity_level = current_vel_ * 100;
+  movement_status_msg_.velocity_level = current_velocity_level_ * 100;
   movement_status_msg_.kinematic_mode = kinematicModeToStr(kinematic_mode_);
   pad_status_pub_.publish(movement_status_msg_);
 }
@@ -111,4 +117,4 @@ std::string PadPluginMovement::kinematicModeToStr(int kinematic_mode)
       return "Unknown";
   }
 }
-}  // namespace
+}  // namespace pad_plugins

@@ -28,10 +28,12 @@ void RobotnikPad::rosReadParams()
   bool required = true;
   bool not_required = false;
 
+  num_of_buttons_ = 14;
+  num_of_axes_ = 4;
   // JOYSTICK PAD TYPE
-  readParam(pnh_, "num_of_buttons", num_of_buttons_, num_of_buttons_, required);
-  readParam(pnh_, "num_of_axes", num_of_axes_, num_of_axes_, required);
-  readParam(pnh_, "pad_type", pad_type_, "ps4", required);
+  readParam(pnh_, "pad/num_of_buttons", num_of_buttons_, num_of_buttons_, required);
+  readParam(pnh_, "pad/num_of_axes", num_of_axes_, num_of_axes_, required);
+  readParam(pnh_, "pad/type", pad_type_, "ps4", required);
 
   std::vector<std::string> plugins_names;
 
@@ -62,20 +64,20 @@ void RobotnikPad::initState()
     axes_.push_back(0.0);
   }
 
-  pad_plugins_loader_ =
-      new pluginlib::ClassLoader<pad_plugins::GenericPadPlugin>("robotnik_pad", "pad_plugins::GenericPadPlugin");
+  pad_plugins_loader_ = new pluginlib::ClassLoader<pad_plugins::GenericPadPlugin>("robotnik_pad", "pad_plugins::"
+                                                                                                  "GenericPadPlugin");
 
-  for (auto &param_plugin : plugins_from_params_)
+  for (auto& param_plugin : plugins_from_params_)
   {
     pad_plugins::GenericPadPlugin::Ptr plugin;
     try
     {
       plugin = pad_plugins_loader_->createInstance(param_plugin.second);
     }
-    catch (pluginlib::PluginlibException &ex)
+    catch (pluginlib::PluginlibException& ex)
     {
-      RCOMPONENT_ERROR_STREAM("Failed to load plugin " << param_plugin.first << "\" of type \"" << param_plugin.second << "."
-                                                       << std::endl
+      RCOMPONENT_ERROR_STREAM("Failed to load plugin " << param_plugin.first << "\" of type \"" << param_plugin.second
+                                                       << "." << std::endl
                                                        << "Exception: " << ex.what());
       continue;
     }
@@ -107,7 +109,7 @@ void RobotnikPad::readyState()
   }
 
   // Call every plugin
-  for (auto &plugin : plugins_)
+  for (auto& plugin : plugins_)
   {
     plugin->execute(buttons_, axes_);
   }
@@ -125,7 +127,7 @@ void RobotnikPad::failureState()
 {
 }
 
-void RobotnikPad::joyCb(const sensor_msgs::Joy::ConstPtr &joy)
+void RobotnikPad::joyCb(const sensor_msgs::Joy::ConstPtr& joy)
 {
   // Fill in the axes and buttons arrays
   for (int i = 0; i < joy->axes.size(); i++)
@@ -139,12 +141,12 @@ void RobotnikPad::joyCb(const sensor_msgs::Joy::ConstPtr &joy)
   tickTopicsHealth("joy");
 }
 
-void RobotnikPad::readPluginsFromParams(const ros::NodeHandle &nh, const std::vector<std::string> &names,
-                                        std::map<std::string, std::string> &plugins_definitions)
+void RobotnikPad::readPluginsFromParams(const ros::NodeHandle& nh, const std::vector<std::string>& names,
+                                        std::map<std::string, std::string>& plugins_definitions)
 {
   plugins_definitions.clear();
 
-  for (const std::string &name : names)
+  for (const std::string& name : names)
   {
     if (nh.hasParam(name) == false)
     {
@@ -171,6 +173,6 @@ void RobotnikPad::readPluginsFromParams(const ros::NodeHandle &nh, const std::ve
   }
 
   RCOMPONENT_INFO_STREAM("I have read " << plugins_definitions.size() << " components:");
-  for (auto &x : plugins_definitions)
+  for (auto& x : plugins_definitions)
     RCOMPONENT_INFO_STREAM(x.first << ": " << x.second);
 }
