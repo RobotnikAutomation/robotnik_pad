@@ -5,17 +5,23 @@
 #include <robotnik_pad/generic_pad_plugin.h>
 #include <robotnik_pad_msgs/MovementStatus.h>
 
+namespace KinematicModes
+{
+  enum KinematicMode
+  {
+      Differential = 0,
+      Omnidirectional = 1,
+  };
+}
+
+typedef KinematicModes::KinematicMode KinematicMode;
+
 namespace pad_plugins
 {
 class PadPluginMovement : public GenericPadPlugin
 {
 public:
   // Probably this should be stablish in generic_pad_plugin
-  enum KinematicMode
-  {
-    Differential = 0,
-    Omnidirectional = 1
-  };
 
   PadPluginMovement();
   ~PadPluginMovement();
