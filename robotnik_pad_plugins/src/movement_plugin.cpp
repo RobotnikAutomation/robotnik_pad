@@ -35,6 +35,9 @@ void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string&
   readParam(pnh_, "max_angular_speed", max_angular_speed_, max_angular_speed_, required);
   cmd_topic_vel_ = "cmd_vel";
   readParam(pnh_, "cmd_topic_vel", cmd_topic_vel_, cmd_topic_vel_, required);
+  // if not set, then ackermann mode cannot be used
+  wheel_base_ = 0;
+  readParam(pnh_, "wheel_base", wheel_base_, wheel_base_);
 
   // Publishers
   twist_pub_ = nh_.advertise<geometry_msgs::Twist>(cmd_topic_vel_, 10);
@@ -73,12 +76,31 @@ void PadPluginMovement::execute(std::vector<Button>& buttons, std::vector<float>
       }
       else if (kinematic_mode_ == KinematicModes::Omnidirectional)
       {
+        if (wheel_base_ == 0)  // not set, ackermann mode cannot be selected
+        {
+          kinematic_mode_ = KinematicModes::Differential;
+        }
+        else
+        {
+          kinematic_mode_ = KinematicModes::Ackermann;
+        }
+      }
+      else if (kinematic_mode_ == KinematicModes::Ackermann)
+      {
         kinematic_mode_ = KinematicModes::Differential;
       }
     }
 
     cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_];
-    cmd_twist_.angular.z = current_velocity_level_ * max_angular_speed_ * axes[axis_angular_z_];
+    if (kinematic_mode_ == KinematicModes::Ackermann)
+    {
+      cmd_twist_.angular.z = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_] *
+                             std::sin(axes[axis_angular_z_] * (M_PI / 2.0)) / wheel_base_;
+    }
+    else
+    {
+      cmd_twist_.angular.z = current_velocity_level_ * max_angular_speed_ * axes[axis_angular_z_];
+    }
 
     if (kinematic_mode_ == KinematicModes::Omnidirectional)
     {
@@ -109,12 +131,14 @@ std::string PadPluginMovement::kinematicModeToStr(int kinematic_mode)
 {
   switch (kinematic_mode)
   {
-    case KinematicModes::Omnidirectional:
-      return "omni";
     case KinematicModes::Differential:
       return "differential";
+    case KinematicModes::Omnidirectional:
+      return "omni";
+    case KinematicModes::Ackermann:
+      return "ackermann";
     default:
-      return "Unknown";
+      return "unknown";
   }
 }
 }  // namespace pad_plugins

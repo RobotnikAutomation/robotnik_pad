@@ -11,6 +11,7 @@ namespace KinematicModes
   {
       Differential = 0,
       Omnidirectional = 1,
+      Ackermann = 2
   };
 }
 
@@ -48,7 +49,8 @@ protected:
   double velocity_level_step_;
   geometry_msgs::Twist cmd_twist_;
   int kinematic_mode_;
-
+  //! used in ackermann mode
+  double wheel_base_;
 protected:
   std::string kinematicModeToStr(int kinematic_mode);
 };
