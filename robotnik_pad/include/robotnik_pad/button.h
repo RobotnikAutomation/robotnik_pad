@@ -27,16 +27,15 @@ public:
     is_pressed_ = value;
   }
 
-  int isPressed()
+  int isPressed() const
   {
     return is_pressed_;
   }
 
-  bool isReleased()
+  bool isReleased() const
   {
-    bool b = is_released_;
-    is_released_ = false;
-    return b;
+    return is_released_;
+  }
   }
 };
 
