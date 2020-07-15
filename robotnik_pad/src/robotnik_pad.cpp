@@ -116,7 +116,7 @@ void RobotnikPad::readyState()
 
   for (auto& button : buttons_)
   {
-    button.updateStateIfButtonHasBeenReleased();
+    button.resetReleased();
   }
 }
 

@@ -37,7 +37,7 @@ public:
     return is_released_;
   }
 
-  void updateStateIfButtonHasBeenReleased()
+  void resetReleased()
   {
     if (is_released_)
       is_released_ = false;
