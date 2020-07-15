@@ -36,6 +36,11 @@ public:
   {
     return is_released_;
   }
+
+  void updateStateIfButtonHasBeenReleased()
+  {
+    if (is_released_)
+      is_released_ = false;
   }
 };
 

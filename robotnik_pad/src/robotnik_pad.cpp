@@ -113,6 +113,11 @@ void RobotnikPad::readyState()
   {
     plugin->execute(buttons_, axes_);
   }
+
+  for (auto& button : buttons_)
+  {
+    button.updateStateIfButtonHasBeenReleased();
+  }
 }
 
 void RobotnikPad::emergencyState()
