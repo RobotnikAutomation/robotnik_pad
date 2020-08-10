@@ -92,33 +92,15 @@ void PadPluginAckermannMovement::execute(std::vector<Button>& buttons, std::vect
       }
     }*/
 
-    cmd_ackermann_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_];
-    if (kinematic_mode_ == KinematicModes::Ackermann)
-    {
-      cmd_ackermann_.angular.z = current_velocity_level_ * max_linear_speed_ * axes[axis_angular_x_]
-      cmd_ackermann_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_]
-    }
-    else
-    {
-      cmd_ackermann_.angular.z = current_velocity_level_ * max_angular_speed_ * axes[axis_angular_z_];
-    }
-
-    if (kinematic_mode_ == KinematicModes::Omnidirectional)
-    {
-      cmd_ackermann_.linear.y = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_y_];
-    }
-    else
-    {
-      cmd_ackermann_.linear.y = 0.0;
-    }
-
+    cmd_ackermann_.speed = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_];
+    cmd_ackermann_.steering_angle = current_velocity_level_ * max_angular_speed_ * axes[axis_angular_x_]
+    
     ackermann_pub_.publish(cmd_ackermann_);
   }
   else if (buttons[button_dead_man_].isReleased())
   {
-    cmd_ackermann_.linear.x = 0.0;
-    cmd_ackermann_.linear.y = 0.0;
-    cmd_ackermann_.angular.z = 0.0;
+    cmd_ackermann_.speed = 0.0;
+    cmd_ackermann_.steering_angle = 0.0;
 
     ackermann_pub_.publish(cmd_ackermann_);
   }
@@ -132,10 +114,6 @@ std::string PadPluginAckermannMovement::kinematicModeToStr(int kinematic_mode)
 {
   switch (kinematic_mode)
   {
-    case KinematicModes::Differential:
-      return "differential";
-    case KinematicModes::Omnidirectional:
-      return "omni";
     case KinematicModes::Ackermann:
       return "ackermann";
     default:
