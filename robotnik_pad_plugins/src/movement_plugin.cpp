@@ -96,6 +96,7 @@ void PadPluginMovement::execute(std::vector<Button>& buttons, std::vector<float>
     {
       cmd_twist_.angular.z = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_] *
                              std::sin(axes[axis_angular_z_] * (M_PI / 2.0)) / wheel_base_;
+      cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_] * std::cos(axes[axis_angular_z_] * (M_PI / 2.0));
     }
     else
     {
