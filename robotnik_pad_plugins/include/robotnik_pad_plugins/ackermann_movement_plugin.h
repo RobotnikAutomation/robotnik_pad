@@ -10,12 +10,6 @@ namespace pad_plugins
 class PadPluginAckermannMovement : public GenericPadPlugin
 {
 public:
-  // Probably this should be stablish in generic_pad_plugin
-  enum KinematicMode
-  {
-    Differential = 0,
-    Omnidirectional = 1
-  };
 
   PadPluginAckermannMovement();
   ~PadPluginAckermannMovement();
@@ -41,10 +35,7 @@ protected:
   //! defines how much you can increase/decrease the max_velocity_level (Normally 0.1)
   double velocity_level_step_;
   ackermann_msgs::AckermannDrive cmd_ackermann_;
-  int kinematic_mode_;
-
-protected:
-  std::string kinematicModeToStr(int kinematic_mode);
+  
 };
 }  // namespace pad_plugins
 #endif  // PAD_PLUGIN_ELEVATOR_H_

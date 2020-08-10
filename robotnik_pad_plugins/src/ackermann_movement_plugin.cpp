@@ -10,7 +10,6 @@ PadPluginAckermannMovement::~PadPluginAckermannMovement()
 {
 }
 
-
 void PadPluginAckermannMovement::initialize(const ros::NodeHandle& nh, const std::string& plugin_ns)
 {
   bool required = true;
@@ -36,9 +35,6 @@ void PadPluginAckermannMovement::initialize(const ros::NodeHandle& nh, const std
   readParam(pnh_, "max_angular_speed", max_angular_speed_, max_angular_speed_, required);
   cmd_topic_vel_ = "cmd_vel";
   readParam(pnh_, "cmd_topic_vel", cmd_topic_vel_, cmd_topic_vel_, required);
-  // if not set, then ackermann mode cannot be used
-  wheel_base_ = 0;
-  readParam(pnh_, "wheel_base", wheel_base_, wheel_base_);
 
   // Publishers
   ackermann_pub_ = nh_.advertise<ackermann_msgs::AckermannDrive>(cmd_topic_vel_, 10);
@@ -51,7 +47,6 @@ void PadPluginAckermannMovement::initialize(const ros::NodeHandle& nh, const std
   min_velocity_level_ = 0.1;
   cmd_ackermann_ = ackermann_msgs::AckermannDrive();
   movement_status_msg_ = robotnik_pad_msgs::MovementStatus();
-  kinematic_mode_ = KinematicModes::Ackermann;
 }
 
 void PadPluginAckermannMovement::execute(std::vector<Button>& buttons, std::vector<float>& axes)
@@ -69,55 +64,21 @@ void PadPluginAckermannMovement::execute(std::vector<Button>& buttons, std::vect
       ROS_INFO("PadPluginAckermannMovement::execute: speed up -> velocity level = %.1f%%", current_velocity_level_ * 100.0);
     }
 
-    /*if (buttons[button_kinematic_mode_].isReleased())
-    {
-      if (kinematic_mode_ == KinematicModes::Differential)
-      {
-        kinematic_mode_ = KinematicModes::Omnidirectional;
-      }
-      else if (kinematic_mode_ == KinematicModes::Omnidirectional)
-      {
-        if (wheel_base_ == 0)  // not set, ackermann mode cannot be selected
-        {
-          kinematic_mode_ = KinematicModes::Differential;
-        }
-        else
-        {
-          kinematic_mode_ = KinematicModes::Ackermann;
-        }
-      }
-      else if (kinematic_mode_ == KinematicModes::Ackermann)
-      {
-        kinematic_mode_ = KinematicModes::Differential;
-      }
-    }*/
-
     cmd_ackermann_.speed = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_];
-    cmd_ackermann_.steering_angle = current_velocity_level_ * max_angular_speed_ * axes[axis_angular_x_]
+    cmd_ackermann_.steering_angle = M_PI/2.0 * axes[axis_angular_z_];
     
     ackermann_pub_.publish(cmd_ackermann_);
   }
-  else if (buttons[button_dead_man_].isReleased())
+  /*else if (buttons[button_dead_man_].isReleased())
   {
     cmd_ackermann_.speed = 0.0;
     cmd_ackermann_.steering_angle = 0.0;
 
     ackermann_pub_.publish(cmd_ackermann_);
-  }
+  }*/
 
   movement_status_msg_.velocity_level = current_velocity_level_ * 100;
-  movement_status_msg_.kinematic_mode = kinematicModeToStr(kinematic_mode_);
+  //movement_status_msg_.kinematic_mode = kinematicModeToStr(kinematic_mode_);
   pad_status_pub_.publish(movement_status_msg_);
-}
-
-std::string PadPluginAckermannMovement::kinematicModeToStr(int kinematic_mode)
-{
-  switch (kinematic_mode)
-  {
-    case KinematicModes::Ackermann:
-      return "ackermann";
-    default:
-      return "unknown";
-  }
 }
 }  // namespace pad_plugins
