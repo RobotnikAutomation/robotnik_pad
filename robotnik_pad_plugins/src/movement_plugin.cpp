@@ -116,7 +116,9 @@ void PadPluginMovement::execute(std::vector<Button>& buttons, std::vector<float>
       cmd_twist_.linear.y = 0.0;
     }
 
-    twist_pub_.publish(cmd_twist_);
+
+    if (cmd_twist_.linear.x != 0 or cmd_twist_.angular.z != 0)
+      twist_pub_.publish(cmd_twist_);
   }
   else if (buttons[button_dead_man_].isReleased())
   {
@@ -124,7 +126,7 @@ void PadPluginMovement::execute(std::vector<Button>& buttons, std::vector<float>
     cmd_twist_.linear.y = 0.0;
     cmd_twist_.angular.z = 0.0;
 
-    twist_pub_.publish(cmd_twist_);
+    //twist_pub_.publish(cmd_twist_);
   }
 
   movement_status_msg_.velocity_level = current_velocity_level_ * 100;
