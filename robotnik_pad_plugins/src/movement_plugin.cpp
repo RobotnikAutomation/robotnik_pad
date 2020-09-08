@@ -35,6 +35,9 @@ void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string&
   readParam(pnh_, "max_angular_speed", max_angular_speed_, max_angular_speed_, required);
   cmd_topic_vel_ = "cmd_vel";
   readParam(pnh_, "cmd_topic_vel", cmd_topic_vel_, cmd_topic_vel_, required);
+  angular_level_multiplicator_ = 1;
+  readParam(pnh_, "angular_level_multiplicator", angular_level_multiplicator_, angular_level_multiplicator_, required);
+
 
   // Publishers
   twist_pub_ = nh_.advertise<geometry_msgs::Twist>(cmd_topic_vel_, 10);
@@ -78,7 +81,19 @@ void PadPluginMovement::execute(std::vector<Button>& buttons, std::vector<float>
     }
 
     cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_];
-    cmd_twist_.angular.z = current_velocity_level_ * max_angular_speed_ * axes[axis_angular_z_];
+    if(angular_level_multiplicator_ >= 0){
+      angular_level_ = angular_level_multiplicator_ * current_velocity_level_;
+    }else{
+      //angular_level_multiplicator_ < 0, it is negative
+      angular_level_ =  abs(angular_level_multiplicator_) * (1.1 - (current_velocity_level_)) ;
+    }
+    if (angular_level_ > 1){
+      angular_level_ = 1;
+    }else if(angular_level_ <= 0){
+      angular_level_ = 0.1;
+    }
+    
+    cmd_twist_.angular.z = angular_level_ * max_angular_speed_ * axes[axis_angular_z_];
 
     if (kinematic_mode_ == Omnidirectional)
     {

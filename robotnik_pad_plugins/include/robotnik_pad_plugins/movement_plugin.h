@@ -42,6 +42,8 @@ protected:
   double velocity_level_step_;
   geometry_msgs::Twist cmd_twist_;
   int kinematic_mode_;
+  float angular_level_multiplicator_;
+  float angular_level_;
 
 protected:
   std::string kinematicModeToStr(int kinematic_mode);
