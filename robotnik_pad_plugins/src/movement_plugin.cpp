@@ -92,8 +92,12 @@ void PadPluginMovement::execute(std::vector<Button>& buttons, std::vector<float>
     }else if(angular_level_ <= 0){
       angular_level_ = 0.1;
     }
-    
-    cmd_twist_.angular.z = angular_level_ * max_angular_speed_ * axes[axis_angular_z_];
+    if (angular_level_multiplicator_ == 0){
+	 cmd_twist_.angular.z = max_angular_speed_ * axes[axis_angular_z_];
+    }
+    else{
+    	cmd_twist_.angular.z = angular_level_ * max_angular_speed_ * axes[axis_angular_z_];
+    }
 
     if (kinematic_mode_ == Omnidirectional)
     {
