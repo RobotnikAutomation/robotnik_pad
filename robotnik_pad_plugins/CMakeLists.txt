@@ -31,6 +31,7 @@ include_directories(
 add_library(robotnik_pad_plugins
   src/movement_plugin.cpp
   src/elevator_plugin.cpp
+  src/ackermann_movement_plugin.cpp
 )
 
 add_dependencies(robotnik_pad_plugins ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

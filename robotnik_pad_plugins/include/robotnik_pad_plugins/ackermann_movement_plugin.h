@@ -1,31 +1,18 @@
-#ifndef PAD_PLUGIN_MOVEMENT_H_
-#define PAD_PLUGIN_MOVEMENT_H_
+#ifndef PAD_PLUGIN_ACKERMANN_MOVEMENT_H_
+#define PAD_PLUGIN_ACKERMANN_MOVEMENT_H_
 
-#include <geometry_msgs/Twist.h>
+#include <ackermann_msgs/AckermannDrive.h>
 #include <robotnik_pad/generic_pad_plugin.h>
 #include <robotnik_pad_msgs/MovementStatus.h>
 
-namespace KinematicModes
-{
-  enum KinematicMode
-  {
-      Differential = 0,
-      Omnidirectional = 1,
-      Ackermann = 2
-  };
-}
-
-typedef KinematicModes::KinematicMode KinematicMode;
-
 namespace pad_plugins
 {
-class PadPluginMovement : public GenericPadPlugin
+class PadPluginAckermannMovement : public GenericPadPlugin
 {
 public:
-  // Probably this should be stablish in generic_pad_plugin
 
-  PadPluginMovement();
-  ~PadPluginMovement();
+  PadPluginAckermannMovement();
+  ~PadPluginAckermannMovement();
 
   virtual void initialize(const ros::NodeHandle& nh, const std::string& plugin_ns);
   virtual void execute(std::vector<Button>& buttons, std::vector<float>& axes);
@@ -36,7 +23,7 @@ protected:
   double max_linear_speed_, max_angular_speed_;
   std::string cmd_topic_vel_;
 
-  ros::Publisher twist_pub_, pad_status_pub_;
+  ros::Publisher ackermann_pub_, pad_status_pub_;
 
   robotnik_pad_msgs::MovementStatus movement_status_msg_;
   //! current velocity level used to compute the target velocity
@@ -47,12 +34,8 @@ protected:
   double min_velocity_level_;
   //! defines how much you can increase/decrease the max_velocity_level (Normally 0.1)
   double velocity_level_step_;
-  geometry_msgs::Twist cmd_twist_;
-  int kinematic_mode_;
-  //! used in ackermann mode
-  double wheel_base_;
-protected:
-  std::string kinematicModeToStr(int kinematic_mode);
+  ackermann_msgs::AckermannDrive cmd_ackermann_;
+  
 };
 }  // namespace pad_plugins
 #endif  // PAD_PLUGIN_ELEVATOR_H_

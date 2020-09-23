@@ -35,6 +35,9 @@ void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string&
   readParam(pnh_, "max_angular_speed", max_angular_speed_, max_angular_speed_, required);
   cmd_topic_vel_ = "cmd_vel";
   readParam(pnh_, "cmd_topic_vel", cmd_topic_vel_, cmd_topic_vel_, required);
+  // if not set, then ackermann mode cannot be used
+  wheel_base_ = 0;
+  readParam(pnh_, "wheel_base", wheel_base_, wheel_base_);
 
   // Publishers
   twist_pub_ = nh_.advertise<geometry_msgs::Twist>(cmd_topic_vel_, 10);
@@ -47,7 +50,7 @@ void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string&
   min_velocity_level_ = 0.1;
   cmd_twist_ = geometry_msgs::Twist();
   movement_status_msg_ = robotnik_pad_msgs::MovementStatus();
-  kinematic_mode_ = Differential;
+  kinematic_mode_ = KinematicModes::Differential;
 }
 
 void PadPluginMovement::execute(std::vector<Button>& buttons, std::vector<float>& axes)
@@ -67,20 +70,40 @@ void PadPluginMovement::execute(std::vector<Button>& buttons, std::vector<float>
 
     if (buttons[button_kinematic_mode_].isReleased())
     {
-      if (kinematic_mode_ == Differential)
+      if (kinematic_mode_ == KinematicModes::Differential)
       {
-        kinematic_mode_ = Omnidirectional;
+        kinematic_mode_ = KinematicModes::Omnidirectional;
       }
-      else if (kinematic_mode_ == Omnidirectional)
+      else if (kinematic_mode_ == KinematicModes::Omnidirectional)
       {
-        kinematic_mode_ = Differential;
+        if (wheel_base_ == 0)  // not set, ackermann mode cannot be selected
+        {
+          kinematic_mode_ = KinematicModes::Differential;
+        }
+        else
+        {
+          kinematic_mode_ = KinematicModes::Ackermann;
+        }
+      }
+      else if (kinematic_mode_ == KinematicModes::Ackermann)
+      {
+        kinematic_mode_ = KinematicModes::Differential;
       }
     }
 
     cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_];
-    cmd_twist_.angular.z = current_velocity_level_ * max_angular_speed_ * axes[axis_angular_z_];
+    if (kinematic_mode_ == KinematicModes::Ackermann)
+    {
+      cmd_twist_.angular.z = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_] *
+                             std::sin(axes[axis_angular_z_] * (M_PI / 2.0)) / wheel_base_;
+      cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_] * std::cos(axes[axis_angular_z_] * (M_PI / 2.0));
+    }
+    else
+    {
+      cmd_twist_.angular.z = current_velocity_level_ * max_angular_speed_ * axes[axis_angular_z_];
+    }
 
-    if (kinematic_mode_ == Omnidirectional)
+    if (kinematic_mode_ == KinematicModes::Omnidirectional)
     {
       cmd_twist_.linear.y = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_y_];
     }
@@ -109,12 +132,14 @@ std::string PadPluginMovement::kinematicModeToStr(int kinematic_mode)
 {
   switch (kinematic_mode)
   {
-    case Omnidirectional:
-      return "omni";
-    case Differential:
+    case KinematicModes::Differential:
       return "differential";
+    case KinematicModes::Omnidirectional:
+      return "omni";
+    case KinematicModes::Ackermann:
+      return "ackermann";
     default:
-      return "Unknown";
+      return "unknown";
   }
 }
 }  // namespace pad_plugins
