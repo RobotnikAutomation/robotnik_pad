@@ -20,7 +20,8 @@ public:
 protected:
   int button_dead_man_, axis_linear_x_, axis_linear_y_, axis_angular_z_, button_kinematic_mode_;
   int button_speed_up_, button_speed_down_;
-  double max_linear_speed_, max_angular_speed_;
+  double max_speed_;
+  double max_steering_angle_;
   std::string cmd_topic_vel_;
 
   ros::Publisher ackermann_pub_, pad_status_pub_;

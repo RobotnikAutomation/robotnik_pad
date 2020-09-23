@@ -29,10 +29,10 @@ void PadPluginAckermannMovement::initialize(const ros::NodeHandle& nh, const std
   readParam(pnh_, "config/button_speed_up", button_speed_up_, button_speed_up_, required);
   button_speed_down_ = 1;
   readParam(pnh_, "config/button_speed_down", button_speed_down_, button_speed_down_, required);
-  max_linear_speed_ = 1.5;
-  readParam(pnh_, "max_linear_speed", max_linear_speed_, max_linear_speed_, required);
-  max_angular_speed_ = 3.0;
-  readParam(pnh_, "max_angular_speed", max_angular_speed_, max_angular_speed_, required);
+  max_speed_ = 1.5;
+  readParam(pnh_, "max_speed", max_speed_, max_speed_, required);
+  max_steering_angle_ = 1.57;
+  readParam(pnh_, "max_steering_angle", max_steering_angle_, max_steering_angle_, required);
   cmd_topic_vel_ = "cmd_vel";
   readParam(pnh_, "cmd_topic_vel", cmd_topic_vel_, cmd_topic_vel_, required);
 
@@ -64,8 +64,8 @@ void PadPluginAckermannMovement::execute(std::vector<Button>& buttons, std::vect
       ROS_INFO("PadPluginAckermannMovement::execute: speed up -> velocity level = %.1f%%", current_velocity_level_ * 100.0);
     }
 
-    cmd_ackermann_.speed = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_];
-    cmd_ackermann_.steering_angle = M_PI/2.0 * axes[axis_angular_z_];
+    cmd_ackermann_.speed = current_velocity_level_ * max_speed_ * axes[axis_linear_x_];
+    cmd_ackermann_.steering_angle = max_steering_angle_ * axes[axis_angular_z_];
     
     ackermann_pub_.publish(cmd_ackermann_);
   }
