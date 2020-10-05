@@ -12,7 +12,7 @@ AckermannMovement:
   type: robotnik_pad_plugins/AckermannMovement
   max_speed: 1.5
   max_steering_angle: 0.6
-  cmd_topic_vel: rbcar_controller/command/ackermann_cmd_vel
+  cmd_topic_vel: pad_teleop/ack_cmd_vel
   config:
     button_deadman: 0
     axis_linear_x: 0
