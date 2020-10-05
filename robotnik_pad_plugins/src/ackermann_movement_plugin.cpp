@@ -23,8 +23,6 @@ void PadPluginAckermannMovement::initialize(const ros::NodeHandle& nh, const std
   readParam(pnh_, "config/axis_linear_y", axis_linear_y_, axis_linear_y_, required);
   axis_angular_z_ = 2;
   readParam(pnh_, "config/axis_angular_z", axis_angular_z_, axis_angular_z_, required);
-  button_kinematic_mode_ = 7;
-  readParam(pnh_, "config/button_kinematic_mode", button_kinematic_mode_, button_kinematic_mode_, required);
   button_speed_up_ = 3;
   readParam(pnh_, "config/button_speed_up", button_speed_up_, button_speed_up_, required);
   button_speed_down_ = 1;
@@ -78,7 +76,6 @@ void PadPluginAckermannMovement::execute(std::vector<Button>& buttons, std::vect
   }*/
 
   movement_status_msg_.velocity_level = current_velocity_level_ * 100;
-  //movement_status_msg_.kinematic_mode = kinematicModeToStr(kinematic_mode_);
   pad_status_pub_.publish(movement_status_msg_);
 }
 }  // namespace pad_plugins
