@@ -73,33 +73,37 @@ void PadPluginMovement::execute(std::vector<Button>& buttons, std::vector<float>
       if (kinematic_mode_ == KinematicModes::Differential)
       {
         kinematic_mode_ = KinematicModes::Omnidirectional;
+        ROS_INFO("PadPluginMovement::execute: switch mode -> from Differential to Omnidirectional");
       }
       else if (kinematic_mode_ == KinematicModes::Omnidirectional)
       {
         if (wheel_base_ == 0)  // not set, ackermann mode cannot be selected
         {
           kinematic_mode_ = KinematicModes::Differential;
+          ROS_INFO("PadPluginMovement::execute: switch mode -> from Omnidirectional to Differential");
         }
         else
         {
           kinematic_mode_ = KinematicModes::Ackermann;
+          ROS_INFO("PadPluginMovement::execute: switch mode -> from Omnidirectional to Ackermann");
         }
       }
       else if (kinematic_mode_ == KinematicModes::Ackermann)
       {
         kinematic_mode_ = KinematicModes::Differential;
+        ROS_INFO("PadPluginMovement::execute: switch mode -> from Ackermann to Differential");
       }
     }
 
-    cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_];
     if (kinematic_mode_ == KinematicModes::Ackermann)
     {
+      cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_] * std::cos(axes[axis_angular_z_] * (M_PI / 2.0));
       cmd_twist_.angular.z = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_] *
                              std::sin(axes[axis_angular_z_] * (M_PI / 2.0)) / wheel_base_;
-      cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_] * std::cos(axes[axis_angular_z_] * (M_PI / 2.0));
     }
     else
     {
+      cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_];
       cmd_twist_.angular.z = current_velocity_level_ * max_angular_speed_ * axes[axis_angular_z_];
     }
 
