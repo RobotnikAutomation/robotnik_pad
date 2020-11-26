@@ -53,7 +53,7 @@ void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string&
   kinematic_mode_ = KinematicModes::Differential;
 }
 
-void PadPluginMovement::execute(std::vector<Button>& buttons, std::vector<float>& axes)
+void PadPluginMovement::execute(const std::vector<Button>& buttons, std::vector<float>& axes)
 {
   if (buttons[button_dead_man_].isPressed())
   {

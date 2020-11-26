@@ -1,8 +1,8 @@
 #ifndef PAD_PLUGIN_ELEVATOR_H_
 #define PAD_PLUGIN_ELEVATOR_H_
 
-#include <robotnik_pad/generic_pad_plugin.h>
 #include <robotnik_msgs/SetElevator.h>
+#include <robotnik_pad/generic_pad_plugin.h>
 
 namespace pad_plugins
 {
@@ -13,7 +13,7 @@ public:
   ~PadPluginElevator();
 
   virtual void initialize(const ros::NodeHandle &nh, const std::string &plugin_ns);
-  virtual void execute(std::vector<Button> &buttons, std::vector<float> &axes);
+  virtual void execute(const std::vector<Button> &buttons, std::vector<float> &axes);
 
 protected:
   int button_dead_man_;
@@ -22,5 +22,5 @@ protected:
   std::string elevator_service_name_;
   ros::ServiceClient set_elevator_client_;
 };
-} // namespace pad_plugins
-#endif // PAD_PLUGIN_ELEVATOR_H_
+}  // namespace pad_plugins
+#endif  // PAD_PLUGIN_ELEVATOR_H_
