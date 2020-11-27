@@ -15,7 +15,7 @@ public:
   ~PadPluginAckermannMovement();
 
   virtual void initialize(const ros::NodeHandle& nh, const std::string& plugin_ns);
-  virtual void execute(std::vector<Button>& buttons, std::vector<float>& axes);
+  virtual void execute(const std::vector<Button>& buttons, std::vector<float>& axes);
 
 protected:
   int button_dead_man_, axis_linear_x_, axis_linear_y_, axis_angular_z_;
@@ -36,7 +36,7 @@ protected:
   //! defines how much you can increase/decrease the max_velocity_level (Normally 0.1)
   double velocity_level_step_;
   ackermann_msgs::AckermannDrive cmd_ackermann_;
-  
+
 };
 }  // namespace pad_plugins
 #endif  // PAD_PLUGIN_ELEVATOR_H_
