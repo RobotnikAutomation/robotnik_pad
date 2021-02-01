@@ -21,6 +21,39 @@ This package may depend on other Robotnik or ROS standard packages in function o
 # located in the workspace folder
 rosdep install --from-path src --ignore-src -y -r
 ```
+
+You need to install the ds4drv pip script
+
+```console
+sudo pip install ds4drv
+```
+
+Install PS4 controller config for ds4drv
+```console
+cd /etc && sudo wget https://raw.githubusercontent.com/RobotnikAutomation/robotnik_pad/master/ds4drv.conf
+```
+```console
+cd /lib/systemd/system && sudo wget https://raw.githubusercontent.com/RobotnikAutomation/robotnik_pad/master/ds4drv.service
+```
+Add the udev rules for PS4 controller
+
+```console
+cd && sudo gedit /etc/udev/rules.d/55-ds4drv.rules
+```
+And paste the following text:
+```
+KERNEL=="js[0-9]*", SUBSYSTEM=="input", SYMLINK+="input/js_base", ATTRS{name}=="Sony Computer Entertainment Wireless Controller"
+```
+
+Enable the execution of the ds4drv service on boot:
+```console
+sudo systemctl daemon-reload
+```
+```console
+sudo systemctl enable ds4drv.service
+```
+You will need to restart your computer for finishing this step, but you can wait until the end of the installation.
+
 ---
 ## 1. robotnik_pad_node
 
