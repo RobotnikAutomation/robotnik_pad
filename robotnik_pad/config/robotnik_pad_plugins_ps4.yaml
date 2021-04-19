@@ -2,6 +2,7 @@ plugins:
   - Movement
   - Elevator
   - Poi
+  - Ptz
 
 pad:
   type: ps4
@@ -36,3 +37,9 @@ Poi:
     deadman: 5
     save_poi_l3: 10
     save_poi_r3: 11
+
+Ptz:
+  type: robotnik_pad_plugins/Ptz
+  ptz_service_name: /foo
+  config:
+    deadman: 5
