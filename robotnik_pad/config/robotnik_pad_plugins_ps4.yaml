@@ -1,6 +1,7 @@
 plugins:
   - Movement
   - Elevator
+  - Poi
 
 pad:
   type: ps4
@@ -27,3 +28,11 @@ Elevator:
   config:
     deadman: 5
     axis_elevator: 10
+
+Poi:
+  type: robotnik_pad_plugins/Poi
+  poi_service_name: poi_manager/save_robot_poi
+  config:
+    deadman: 5
+    save_poi_l3: 10
+    save_poi_r3: 11
