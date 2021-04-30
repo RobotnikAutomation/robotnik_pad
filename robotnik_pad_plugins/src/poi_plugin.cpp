@@ -25,6 +25,7 @@ namespace pad_plugins{
         readParam(pnh_, "poi_service_name", poi_service_name_, poi_service_name_, required);
 
         toggle = true;
+        counter = 0;
 
         // Service client
        save_robot_poi_client_ = nh_.serviceClient<robotnik_msgs::SetString>(poi_service_name_);
@@ -43,11 +44,12 @@ namespace pad_plugins{
                 toggle = false;
 
                 robotnik_msgs::SetString poi_trigger;
-                poi_trigger.request.data = "P100";
-                
+                poi_trigger.request.data = "PAD" + std::to_string(counter);                
+
                 if (save_robot_poi_client_.call(poi_trigger)){
 
-                    ROS_INFO("PadPluginPoi::execute: new point saved");
+                    ROS_INFO("PadPluginPoi::execute: new point %s saved", poi_trigger.request.data.c_str());
+                    counter++;
 
                 }
                 else{

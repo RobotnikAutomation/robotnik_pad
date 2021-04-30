@@ -20,6 +20,8 @@ public:
   int save_poi_l3_;
   int save_poi_r3_;
 
+  int counter;
+
 protected:
 
   bool toggle;
