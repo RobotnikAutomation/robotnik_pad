@@ -44,11 +44,10 @@ namespace pad_plugins{
                 toggle = false;
 
                 robotnik_msgs::SetString poi_trigger;
-                poi_trigger.request.data = "PAD" + std::to_string(counter);                
 
                 if (save_robot_poi_client_.call(poi_trigger)){
 
-                    ROS_INFO("PadPluginPoi::execute: new point %s saved", poi_trigger.request.data.c_str());
+                    ROS_INFO("PadPluginPoi::execute: new point saved");
                     counter++;
 
                 }
