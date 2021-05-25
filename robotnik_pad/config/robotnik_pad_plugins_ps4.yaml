@@ -30,16 +30,36 @@ Elevator:
     deadman: 5
     axis_elevator: 10
 
-Poi:
-  type: robotnik_pad_plugins/Poi
-  poi_service_name: poi_manager/save_robot_poi
-  config:
-    deadman: 5
-    save_poi_l3: 10
-    save_poi_r3: 11
+# Poi:
+#   type: robotnik_pad_plugins/Poi
+#   poi_service_name: poi_manager/save_robot_poi
+#   config:
+#     deadman: 5
+#     save_poi_l3: 10
+#     save_poi_r3: 11
 
 Ptz:
   type: robotnik_pad_plugins/Ptz
-  ptz_service_name: /foo
+  cmd_topic_ptz: /axis_camera/ptz_command
+  
+  speed_control: false
+  speed_increment: 0.1
+  speed_limit: 3.14
+  
+  position_increment: 0.1
+  position_increment_limit: 1.0
+  min_pan_position: -3.14
+  max_pan_position: 3.14
+  min_tilt_position: -1.57
+  max_tilt_position: 1.57
+  max_zoom_position: 12000
+
   config:
     deadman: 5
+    home: 12
+    vertical_arrow:  10
+    horizontal_arrow: 9
+    zoom_in: 4 
+    zoom_out: 6
+    step_up: 2 
+    step_down: 0
