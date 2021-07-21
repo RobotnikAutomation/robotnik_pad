@@ -21,6 +21,7 @@
     <!-- Parameters -->
     <node name="robotnik_pad" pkg="robotnik_pad" type="robotnik_pad_node" output="screen" launch-prefix="$(arg launch_prefix)">
         <rosparam command="load" file="$(arg pad_config)" />
+        <param name="desired_freq" value="100.0" />
     </node>
 
 </launch>

@@ -12,13 +12,14 @@ find_package(catkin REQUIRED COMPONENTS
   pluginlib
   robotnik_pad
   robotnik_pad_msgs
+  kinova_msgs
 )
 
 
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES robotnik_pad_plugins
-  CATKIN_DEPENDS roscpp pluginlib robotnik_pad robotnik_pad_msgs
+  CATKIN_DEPENDS roscpp pluginlib robotnik_pad robotnik_pad_msgs kinova_msgs
 #  DEPENDS system_lib
 )
 
@@ -32,6 +33,7 @@ add_library(robotnik_pad_plugins
   src/movement_plugin.cpp
   src/elevator_plugin.cpp
   src/ackermann_movement_plugin.cpp
+  src/kinova_arm_plugin.cpp
 )
 
 add_dependencies(robotnik_pad_plugins ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

@@ -53,12 +53,14 @@
   <build_depend>pluginlib</build_depend>
   <build_depend>robotnik_pad</build_depend>
   <build_depend>robotnik_pad_msgs</build_depend>
+  <build_depend>kinova_msgs</build_depend>
 
   <build_export_depend>roscpp</build_export_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>pluginlib</exec_depend>
   <exec_depend>robotnik_pad</exec_depend>
   <exec_depend>robotnik_pad_msgs</exec_depend>
+  <exec_depend>kinova_msgs</exec_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
