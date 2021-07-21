@@ -89,7 +89,7 @@ void PadPluginKinovaArm::execute(const std::vector<Button>& buttons, std::vector
 
     arm_control_msg_.twist_angular_x = current_velocity_level_ * max_angular_speed_ * axes[axis_angular_x_];
     arm_control_msg_.twist_angular_y = current_velocity_level_ * max_angular_speed_ * axes[axis_angular_y_];
-    arm_control_msg_.twist_angular_z = current_velocity_level_ * max_angular_speed_ * axes[axis_angular_z_];
+    arm_control_msg_.twist_angular_z = - current_velocity_level_ * max_angular_speed_ * axes[axis_angular_z_] * 2;
 
     
     arm_control_msg_.fingers_closure_percentage = fingers_closure_percentage_;
