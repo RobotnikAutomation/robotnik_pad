@@ -1,7 +1,7 @@
 plugins:
   - Movement
   - Elevator
-  - KinovaArm
+  - KinovaArmGen3
 
 pad:
   type: ps4
@@ -29,10 +29,10 @@ Elevator:
     deadman: 5
     axis_elevator: 10
 
-KinovaArm:
-  type: robotnik_pad_plugins/KinovaArm
-  arm_control_topic_name: /robot/j2s6s200_controller/in/cartesian_velocity_with_fingers
-  set_home_service_name: /robot/j2s6s200_controller/in/home_arm
+KinovaArmGen3:
+  type: robotnik_pad_plugins/KinovaArmGen3
+  arm_control_topic_name: /robot/arm/in/cartesian_velocity
+  set_home_service_name: /robot/arm/in/home_arm
   max_linear_speed: 2.0
   max_angular_speed: 3.0
   config:

@@ -35,6 +35,7 @@ add_library(robotnik_pad_plugins
   src/elevator_plugin.cpp
   src/ackermann_movement_plugin.cpp
   src/kinova_arm_plugin.cpp
+  src/kinova_arm_gen3_plugin.cpp
 )
 
 add_dependencies(robotnik_pad_plugins ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

@@ -44,7 +44,7 @@ protected:
   //! defines how much you can increase/decrease the max_velocity_level (Normally 0.1)
   double velocity_level_step_;
 
-  kinova_msgs::PoseVelocityWithFingers arm_control_msg_;
+  kortex_driver::TwistCommand arm_control_msg_;
 };
 }  // namespace pad_plugins
 #endif  // PAD_PLUGIN_ELEVATOR_H_
