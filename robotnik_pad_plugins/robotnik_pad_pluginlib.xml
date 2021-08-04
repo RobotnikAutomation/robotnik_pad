@@ -11,4 +11,7 @@
     <class name="robotnik_pad_plugins/KinovaArm" type="pad_plugins::PadPluginKinovaArm" base_class_type="pad_plugins::GenericPadPlugin">
         <description>This is the Pad movement plugin for controlling the arm.</description>
     </class>
+    <class name="robotnik_pad_plugins/KinovaArmGen3" type="pad_plugins::PadPluginKinovaArmGen3" base_class_type="pad_plugins::GenericPadPlugin">
+        <description>This is the Pad movement plugin for controlling the gen3 arm.</description>
+    </class>
 </library>
