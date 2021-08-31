@@ -1,2 +1,0 @@
-float32 velocity_level
-float32 fingers_closure_percentage

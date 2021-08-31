@@ -43,7 +43,6 @@ find_package(catkin REQUIRED COMPONENTS actionlib_msgs std_msgs geometry_msgs me
 add_message_files(DIRECTORY msg
   FILES
   MovementStatus.msg
-  KinovaArmStatus.msg
 )
 
 ## Generate services in the 'srv' folder

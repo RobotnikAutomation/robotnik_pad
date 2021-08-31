@@ -9,7 +9,7 @@
     <arg name="pad_model" default="$(optenv ROBOT_PAD_MODEL ps4)"/>
     <arg name="pad_deadzone" default="$(optenv ROBOT_PAD_DEADZONE 0.12)" />
     <arg name="joy_dev" default="$(optenv ROBOT_PAD_DEV /dev/input/js_base)" />
-    <arg name="pad_config" default="$(find robotnik_pad)/config/robotnik_pad_plugins_$(arg pad_model).yaml" />
+    <arg name="pad_config" default="$(find robotnik_pad)/config/robotnik_pad_plugins_$(arg pad_model)_kinova_arm.yaml" />
 
     <!-- joy node -->
     <node pkg="joy" type="joy_node" name="joy" output="screen" respawn="true">
