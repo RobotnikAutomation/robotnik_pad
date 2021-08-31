@@ -1,8 +1,8 @@
 plugins:
   - Movement
   - Elevator
-  - Poi
-  - Ptz
+#  - Poi
+#  - Ptz
 
 pad:
   type: ps4
@@ -38,28 +38,32 @@ Elevator:
 #     save_poi_l3: 10
 #     save_poi_r3: 11
 
-Ptz:
-  type: robotnik_pad_plugins/Ptz
-  cmd_topic_ptz: /axis_camera/ptz_command
+# Ptz:
+#   type: robotnik_pad_plugins/Ptz
+#   cmd_topic_ptz: /ptz/command
   
-  speed_control: false
-  speed_increment: 0.1
-  speed_limit: 3.14
-  
-  position_increment: 0.1
-  position_increment_limit: 1.0
-  min_pan_position: -3.14
-  max_pan_position: 3.14
-  min_tilt_position: -1.57
-  max_tilt_position: 1.57
-  max_zoom_position: 12000
+#   speed_increment: 0.1
+#   speed_limit: 3.14
 
-  config:
-    deadman: 5
-    home: 12
-    vertical_arrow:  10
-    horizontal_arrow: 9
-    zoom_in: 4 
-    zoom_out: 6
-    step_up: 2 
-    step_down: 0
+#   home_pan_position: 0.0
+#   home_tilt_position: 0.0
+#   home_zoom_position: 0.0
+  
+#   position_increment: 0.1
+#   position_increment_limit: 1.0
+#   min_pan_position: -3.14
+#   max_pan_position: 3.14
+#   min_tilt_position: -1.57
+#   max_tilt_position: 1.57
+#   max_zoom_position: 12000
+
+#   config:
+#     button_deadman: 5
+#     button_home: 12
+#     button_pan:  10
+#     button_tilt: 9
+#     button_zoom_in: 4 
+#     button_zoom_out: 6
+#     button_increment_up: 2 
+#     button_increment_down: 0
+#     button_ptz_mode: 8

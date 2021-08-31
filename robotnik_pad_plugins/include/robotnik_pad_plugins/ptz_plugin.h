@@ -5,6 +5,16 @@
 #include <robotnik_pad/generic_pad_plugin.h>
 #include <robotnik_pad/button.h>
 
+
+namespace PtzModes
+{
+  enum PtzMode
+  {
+      Position = 0,
+      Speed = 1
+  };
+}
+
 namespace pad_plugins
 {
 class PadPluginPtz : public GenericPadPlugin
@@ -21,6 +31,7 @@ public:
   robotnik_msgs::ptz positionControl(const std::vector<Button> &buttons);
   robotnik_msgs::ptz speedControl(const std::vector<Button> &buttons);
   robotnik_msgs::ptz home();
+  int ptzMode(const std::vector<Button> &buttons);
   void zoomControl(const std::vector<Button> &buttons);
   void publishPtz(robotnik_msgs::ptz cmd_ptz);
 
@@ -31,6 +42,7 @@ protected:
   int button_zoom_in_, button_zoom_out_;
   int button_step_up_ , button_step_down_;
   int button_home_;
+  int button_ptz_mode_;
 
   Button up_arrow, down_arrow, left_arrow, right_arrow;
 
@@ -48,11 +60,20 @@ protected:
 
   double zoom_level_;
 
+  double home_pan_position_;
+  double home_tilt_position_;
+  double home_zoom_position_;
+
+  int ptz_mode_;
+
   ros::Publisher ptz_pub_;
   std::string cmd_topic_ptz_;
 
   robotnik_msgs::ptz old_cmd_ptz_;
-  bool speed_control_;
+
+  double timeout;
+  int timeout_counter;
+  double last_time;
 
 };
 }  // namespace pad_plugins
