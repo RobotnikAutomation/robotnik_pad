@@ -30,7 +30,7 @@ Elevator:
     axis_elevator: 10
 
 KinovaArmGen3:
-  type: robotnik_pad_plugins/KinovaArmGen3
+  type: kinova_gen3_pad_plugin/KinovaArmGen3
   arm_control_topic_name: /robot/arm/in/cartesian_velocity
   set_home_service_name: /robot/arm/in/home_arm
   max_linear_speed: 2.0
