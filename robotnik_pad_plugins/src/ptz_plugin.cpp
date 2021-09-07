@@ -14,7 +14,7 @@ namespace pad_plugins
 
         bool required = true;
         pnh_ = ros::NodeHandle(nh, plugin_ns);
-        nh_ = nh;
+        nh_ = ros::NodeHandle();
 
         readParam(pnh_, "config/button_deadman", button_dead_man_, button_dead_man_, required);
         readParam(pnh_, "config/button_home", button_home_, button_home_, required);
@@ -51,13 +51,13 @@ namespace pad_plugins
         tilt_position_ = 0.0;
         pan_position_ = 0.0;
         zoom_position_ = 0.0;
-        current_position_increment_= 0.1;
+        current_position_increment_= position_increment_;
 
         tilt_speed_ = 0.0;
         pan_speed_ = 0.0;
-        current_speed_ = 0.5;
+        current_speed_ = speed_increment_;
         
-        ptz_mode_ = PtzModes::Position;
+        ptz_mode_ = PtzModes::Speed;
 
         zoom_level_ = 50;
 
@@ -199,7 +199,7 @@ namespace pad_plugins
         cmd_ptz.pan = pan_position_;
         cmd_ptz.tilt = tilt_position_;
         //cmd_ptz.zoom = zoom_position_;
-        cmd_ptz.relative = true;
+        cmd_ptz.relative = false;
         cmd_ptz.mode="position";
         
         return cmd_ptz;
@@ -306,10 +306,10 @@ namespace pad_plugins
             tilt_position_ = 0.0;
             pan_position_ = 0.0;
             zoom_position_ = 0.0;
-            current_position_increment_= 0.1;
+            current_position_increment_= position_increment_;
             tilt_speed_ = 0.0;
             pan_speed_ = 0.0;
-            current_speed_ = 0.5;
+            current_speed_ = speed_increment_;
 
         }
 
@@ -372,6 +372,16 @@ namespace pad_plugins
         }
 
         else if (buttons[button_dead_man_].isReleased()){
+
+            if(mode == PtzModes::Speed){
+                
+                cmd_ptz.pan = 0.0;
+                cmd_ptz.tilt = 0.0;
+                cmd_ptz.zoom = 0.0;
+                cmd_ptz.relative = false;
+                cmd_ptz.mode="speed";
+                publishPtz(cmd_ptz);
+            }
 
         }
 
