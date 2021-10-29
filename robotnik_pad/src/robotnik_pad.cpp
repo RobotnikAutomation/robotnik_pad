@@ -14,8 +14,8 @@ int RobotnikPad::rosSetup()
 {
   RComponent::rosSetup();
 
-  joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("joy", 10, &RobotnikPad::joyCb, this);
-  addTopicsHealth(&joy_sub_, "joy", 5);
+  joy_sub_ = nh_.subscribe<sensor_msgs::Joy>(joy_topic_, 10, &RobotnikPad::joyCb, this);
+  addTopicsHealth(&joy_sub_, joy_topic_, 5);
 }
 
 int RobotnikPad::rosShutdown()
@@ -34,6 +34,7 @@ void RobotnikPad::rosReadParams()
   readParam(pnh_, "pad/num_of_buttons", num_of_buttons_, num_of_buttons_, required);
   readParam(pnh_, "pad/num_of_axes", num_of_axes_, num_of_axes_, required);
   readParam(pnh_, "pad/type", pad_type_, "ps4", required);
+  readParam(pnh_, "pad/joy_topic", joy_topic_, "/joy", not_required);
 
   std::vector<std::string> plugins_names;
 
@@ -143,7 +144,7 @@ void RobotnikPad::joyCb(const sensor_msgs::Joy::ConstPtr& joy)
   {
     buttons_[i].press(joy->buttons[i]);
   }
-  tickTopicsHealth("joy");
+  tickTopicsHealth(joy_topic_);
 }
 
 void RobotnikPad::readPluginsFromParams(const ros::NodeHandle& nh, const std::vector<std::string>& names,

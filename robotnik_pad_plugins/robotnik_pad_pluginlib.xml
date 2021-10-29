@@ -8,4 +8,7 @@
     <class name="robotnik_pad_plugins/AckermannMovement" type="pad_plugins::PadPluginAckermannMovement" base_class_type="pad_plugins::GenericPadPlugin">
         <description>This is the Pad movement plugin with ackermann msgs.</description>
     </class>
+    <class name="robotnik_pad_plugins/MoveitServoTeleoperation" type="pad_plugins::PadPluginMoveitServoTeleoperation" base_class_type="pad_plugins::GenericPadPlugin">
+        <description>This is the Pad moveit servo teleoperation plugin.</description>
+    </class>
 </library>

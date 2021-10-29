@@ -5,17 +5,18 @@
     <arg if="$(arg debug)" name="launch_prefix" default="gdb -ex run --args"/>
     <arg unless="$(arg debug)" name="launch_prefix" default=""/>
 
-    <arg name="autorepeat_rate" default="10.0"/>
-    <arg name="pad_model" default="$(optenv ROBOT_PAD_MODEL ps4)"/>
-    <arg name="pad_deadzone" default="$(optenv ROBOT_PAD_DEADZONE 0.12)" />
-    <arg name="joy_dev" default="$(optenv ROBOT_PAD_DEV /dev/input/js_base)" />
+    <arg name="zero_when_static" default="true"/>
+    <arg name="static_count_threshold" default="30"/>
+    <arg name="static_trans_deadband" default="0.05"/>
+    <arg name="static_rot_deadband" default="0.1"/>
+    <arg name="pad_model" default="$(optenv ROBOT_PAD_MODEL spacenav_kinova_arm)"/>
     <arg name="pad_config" default="$(find robotnik_pad)/config/robotnik_pad_plugins_$(arg pad_model).yaml" />
 
-    <!-- joy node -->
-    <node pkg="joy" type="joy_node" name="joy" output="screen" respawn="true">
-        <param name="dev" type="string" value="$(arg joy_dev)" />
-        <param name="deadzone" value="$(arg pad_deadzone)" />
-        <param name="autorepeat_rate" value="$(arg autorepeat_rate)" type="double" />
+    <node pkg="spacenav_node" type="spacenav_node" name="$(anon spacenav_node)" output="screen">
+        <param name="zero_when_static" value="$(arg zero_when_static)"/>
+        <param name="static_count_threshold" value="$(arg static_count_threshold)"/>
+        <param name="static_trans_deadband" value="$(arg static_trans_deadband)"/>
+        <param name="static_rot_deadband" value="$(arg static_rot_deadband)"/>
     </node>
 
     <!-- Parameters -->

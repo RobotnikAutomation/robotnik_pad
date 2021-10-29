@@ -1,0 +1,31 @@
+plugins:
+  - Teleoperation
+
+pad:
+  type: spacenav
+  num_of_buttons: 2
+  num_of_axes: 6
+  joy_topic: /spacenav/joy
+
+Teleoperation:
+  type: robotnik_pad_plugins/MoveitServoTeleoperation
+  moveit_servo_twist_topic: /servo_server/delta_twist_cmds
+  finger_velocity_topic: /j2s6s200_driver/in/finger_velocity
+  max_linear_speed: 0.3
+  max_angular_speed: 0.8
+  max_finger_speed: 2000
+  rot_deadband: 0.1 
+  linear_deadband: 0.05
+  end_effector_frame: j2s6s200_end_effector
+  base_link_frame: world  
+  config:
+    axis_linear_x_ee: 0
+    axis_linear_y_ee: 1
+    axis_linear_z_ee: 2
+
+    axis_angular_x_ee: 3
+    axis_angular_y_ee: 4
+    axis_angular_z_ee: 5
+
+    button_open: 6
+    button_close: 7
