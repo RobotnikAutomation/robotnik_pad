@@ -41,6 +41,10 @@ nfo_colour="${light_purple_colour}"
 suc_colour="${green_colour}"
 no_colour='\033[0m'
 
+#root permision
+
+err_str_root_permission='echo "You need root privileges try:\nsudo ${0}'
+
 #udev
 udev_rule_file="55-ds4drv.rules"
 udev_rule_destiny="/etc/udev/rules.d/${udev_rule_file}"
@@ -78,12 +82,16 @@ function print_success() {
 	local message="${1}"
 	eval "echo -e "'"'"${suc_colour}[SUCCESS]${no_colour}: ${message}"'"'""
 }
+
 function check_root_permission() {
 	if [[ "${EUID}" = 0 ]]; then
 		return 0
 	else
-		echo "You need root privileges try:" >&2
-		echo "sudo ${0}"
+		print_error "${err_str_root_permission}"
+		return 1
+	fi
+}
+
 function copy_udev_rules() {
 	if ! eval "${udev_rule_copy_command}"; then
 		print_error "${err_str_udev_copy}"
