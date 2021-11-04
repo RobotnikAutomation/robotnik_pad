@@ -21,7 +21,14 @@ This package may depend on other Robotnik or ROS standard packages in function o
 # located in the workspace folder
 rosdep install --from-path src --ignore-src -y -r
 ```
+### ds4drv automatic install
+in order to install the ds4drv and its components you can use the installer:
+```bash
+sudo ./ds4drv-install.sh
+```
+Now you your system should be ready
 
+### ds4drv manual install
 You need to install the ds4drv pip script:
 
 ```bash
