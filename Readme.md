@@ -24,21 +24,21 @@ rosdep install --from-path src --ignore-src -y -r
 
 You need to install the ds4drv pip script
 
-```console
+```bash
 sudo pip install ds4drv
 ```
 
 Install PS4 controller config for ds4drv
-```console
+```bash
 cd /etc && sudo wget https://raw.githubusercontent.com/RobotnikAutomation/robotnik_pad/master/ds4drv.conf
 ```
-```console
 cd /lib/systemd/system && sudo wget https://raw.githubusercontent.com/RobotnikAutomation/robotnik_pad/master/ds4drv.service
+```bash
 ```
 Add the udev rules for PS4 controller
 
-```console
 cd && sudo gedit /etc/udev/rules.d/55-ds4drv.rules
+```bash
 ```
 And paste the following text:
 ```
@@ -46,10 +46,10 @@ KERNEL=="js[0-9]*", SUBSYSTEM=="input", SYMLINK+="input/js_base", ATTRS{name}=="
 ```
 
 Enable the execution of the ds4drv service on boot:
-```console
+```bash
 sudo systemctl daemon-reload
 ```
-```console
+```bash
 sudo systemctl enable ds4drv.service
 ```
 You will need to restart your computer for finishing this step, but you can wait until the end of the installation.
@@ -112,28 +112,28 @@ Available plugins:
 This an example of a config file loading a single plugin:
 
 ```yaml
-
+---
 plugins:
- - Movement
+  - Movement
 
 pad:
- type: ps4
- num_of_buttons: 14
- num_of_axes: 14
+  type: ps4
+  num_of_buttons: 14
+  num_of_axes: 14
 
 Movement:
- type: robotnik_pad_plugins/Movement
- max_linear_speed: 1.5
- max_angular_speed: 3.0
- cmd_topic_vel: pad_teleop/cmd_vel
- config:
-   button_deadman: 5
-   axis_linear_x: 1
-   axis_linear_y: 0
-   axis_angular_z: 2
-   button_speed_up: 3
-   button_speed_down: 1
-   button_kinematic_mode: 7
+  type: robotnik_pad_plugins/Movement
+  max_linear_speed: 1.5
+  max_angular_speed: 3.0
+  cmd_topic_vel: pad_teleop/cmd_vel
+  config:
+    button_deadman: 5
+    axis_linear_x: 1
+    axis_linear_y: 0
+    axis_angular_z: 2
+    button_speed_up: 3
+    button_speed_down: 1
+    button_kinematic_mode: 7
 ```
 
 First of all you need to define a list containing the different plugins you want to load. Then, for each of the plugins you want to load, you should specify its parameters.
