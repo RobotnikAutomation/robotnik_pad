@@ -52,7 +52,14 @@ sudo systemctl daemon-reload
 ```bash
 sudo systemctl enable ds4drv.service
 ```
-You will need to restart your computer for finishing this step, but you can wait until the end of the installation.
+Now the ds4drv is loaded on boot.
+
+To enable the joystick without rebooting:
+
+```bash
+sudo udevadm control --reload-rules && sudo udevadm trigger
+sudo systemctl start ds4drv.service
+```
 
 ---
 ## 1. robotnik_pad_node
