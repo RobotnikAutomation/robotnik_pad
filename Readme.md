@@ -37,8 +37,8 @@ cd /etc/systemd/system && sudo wget https://raw.githubusercontent.com/RobotnikAu
 ```
 Add the udev rules for PS4 controller
 
-cd && sudo gedit /etc/udev/rules.d/55-ds4drv.rules
 ```bash
+cd /etc/udev/rules.d/ && sudo wget https://raw.githubusercontent.com/RobotnikAutomation/robotnik_pad/master/55-ds4drv.rules
 ```
 And paste the following text:
 ```
