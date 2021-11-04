@@ -68,6 +68,15 @@ systemd_daemon_reload_command="systemctl daemon-reload"
 systemd_enable_service_command="systemctl enable ${systemd_service_file}"
 systemd_start_service_command="systemctl enable ${systemd_service_file}"
 
+suc_str_systemd_install='systemd service active'
+
+err_str_systemd_copy='error copying systemd service ${udev_rule_file}'
+err_str_systemd_reload='error systemd reloading daemon '
+err_str_systemd_enable='error enabling ${systemd_service_file} systemd service'
+err_str_systemd_start='error starting ${systemd_service_file} systemd service'
+
+nfo_str_systemd_install='installing service active'
+
 function print_error() {
 	local message="${1}"
 	eval "echo -e "'"'"${err_colour}[ERROR]${no_colour}:   ${message}"'"'" 2>&1"
@@ -110,14 +119,30 @@ function reload_udev_rules() {
 }
 
 function copy_systemd_service() {
+	if ! eval "${systemd_service_copy_command}"; then
+		print_error "${err_str_systemd_copy}"
+	fi
+	return 0
+}
+
+function reload_systemd_daemons() {
+	if ! eval "${systemd_daemon_reload_command}"; then
+		print_error "${err_str_systemd_reload}"
+	fi
 	return 0
 }
 
 function enable_systemd_service() {
+	if ! eval "${systemd_enable_service_command}"; then
+		print_error "${err_str_systemd_enable}"
+	fi
 	return 0
 }
 
 function start_systemd_service() {
+	if ! eval "${systemd_start_service_command}"; then
+		print_error "${err_str_systemd_start}"
+	fi
 	return 0
 }
 
@@ -139,6 +164,20 @@ function install_udev_rules() {
 }
 
 function install_systemd_service() {
+	print_info "${nfo_str_systemd_install}"
+	if ! copy_systemd_service; then
+		return 1
+	fi
+	if ! reload_systemd_daemons; then
+		return 1
+	fi
+	if ! enable_systemd_service; then
+		return 1
+	fi
+	if ! start_systemd_service; then
+		return 1
+	fi
+	print_success "${suc_str_systemd_install}"
 	return 0
 }
 
