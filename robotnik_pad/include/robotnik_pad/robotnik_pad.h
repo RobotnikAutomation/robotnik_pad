@@ -61,6 +61,7 @@ protected:
   int num_of_buttons_;
   int num_of_axes_;
   std::string pad_type_;
+  std::string joy_topic_;
 
   //! Vector to save the axis values
   std::vector<float> axes_;
