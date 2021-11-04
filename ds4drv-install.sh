@@ -77,6 +77,19 @@ err_str_systemd_start='error starting ${systemd_service_file} systemd service'
 
 nfo_str_systemd_install='installing service active'
 
+suc_str_ds4drv_install='ds4drv installed'
+
+ds4drv_search_python_command='which python'
+ds4drv_search_python3_command='which python3'
+ds4drv_search_pip_command='${python_bin} -m pip --version &>/dev/null'
+ds4drv_pip_install_ds4dr_command='${python_bin} -m pip install ds4drv'
+
+err_str_ds4drv_search_python='python not found'
+err_str_ds4drv_search_pip='pip in not installed'
+err_str_ds4drv_pip_install_ds4dr='could install ds4drv'
+
+nfo_str_ds4drv_install='installing ds4drv'
+
 function print_error() {
 	local message="${1}"
 	eval "echo -e "'"'"${err_colour}[ERROR]${no_colour}:   ${message}"'"'" 2>&1"
@@ -146,8 +159,44 @@ function start_systemd_service() {
 	return 0
 }
 
+function search_python3() {
+	if eval "${ds4drv_search_python3_command}"; then
+		python_bin="$(eval "${ds4drv_search_python3_command}")"
+		return 0
+	fi
+	if ! eval "${ds4drv_search_python_command}"; then
+		print_error "${err_str_ds4drv_search_python}"
+		return 1
+	fi
+	python_bin="$(eval "${ds4drv_search_python_command}")"
+	return 0
+
+}
+function search_pip() {
+	if ! eval "${ds4drv_search_pip_command}"; then
+		print_error "${err_str_ds4drv_search_pip}"
+		return 1
+	fi
+}
+function pip_install_ds4dr() {
+	if ! eval "${ds4drv_pip_install_ds4dr_command}"; then
+		print_error "${err_str_ds4drv_pip_install_ds4dr}"
+		return 1
+	fi
+}
 
 function install_ds4drv() {
+	print_info "${nfo_str_ds4drv_install}"
+	if ! search_python3; then
+		return 1
+	fi
+	if ! search_pip; then
+		return 1
+	fi
+	if ! pip_install_ds4dr; then
+		return 1
+	fi
+	print_success "${suc_str_ds4drv_install}"
 	return 0
 }
 
