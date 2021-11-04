@@ -48,6 +48,14 @@ udev_rule_destiny="/etc/udev/rules.d/${udev_rule_file}"
 udev_rule_copy_command="cp ${udev_rule_file} ${udev_rule_destiny}"
 udev_reload_rules_command="udevadm control --reload-rules && udevadm trigger"
 
+suc_str_udev_install='udev rules active'
+
+err_str_udev_copy='error copying udev rules ${udev_rule_file}'
+err_str_udev_reload='error reloading udev rules'
+
+nfo_str_udev_install='Installing udev rules'
+
+#systemd
 systemd_service_file="ds4drv.service"
 systemd_service_destiny="/etc/systemd/system/${systemd_service_file}"
 
@@ -76,8 +84,21 @@ function check_root_permission() {
 	else
 		echo "You need root privileges try:" >&2
 		echo "sudo ${0}"
+function copy_udev_rules() {
+	if ! eval "${udev_rule_copy_command}"; then
+		print_error "${err_str_udev_copy}"
 		return 1
 	fi
+	return 0
+}
+
+function reload_udev_rules() {
+	if ! eval "${udev_reload_rules_command}"; then
+		print_error "${err_str_udev_reload}"
+		return 1
+	fi
+
+	return 0
 }
 
 function install_ds4drv() {
@@ -85,6 +106,14 @@ function install_ds4drv() {
 }
 
 function install_udev_rules() {
+	print_info "${nfo_str_udev_install}"
+	if ! copy_udev_rules; then
+		return 1
+	fi
+	if ! reload_udev_rules; then
+		return 1
+	fi
+	print_success "${suc_str_udev_install}"
 	return 0
 }
 
