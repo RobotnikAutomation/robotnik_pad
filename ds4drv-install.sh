@@ -101,6 +101,19 @@ function reload_udev_rules() {
 	return 0
 }
 
+function copy_systemd_service() {
+	return 0
+}
+
+function enable_systemd_service() {
+	return 0
+}
+
+function start_systemd_service() {
+	return 0
+}
+
+
 function install_ds4drv() {
 	return 0
 }
