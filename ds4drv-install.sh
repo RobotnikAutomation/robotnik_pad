@@ -32,6 +32,11 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+udev_rule_file="55-ds4drv.rules"
+udev_rule_destiny="/etc/udev/rules.d/${udev_rule_file}"
+
+udev_rule_copy_command="cp ${udev_rule_file} ${udev_rule_destiny}"
+udev_reload_rules_command="udevadm control --reload-rules && udevadm trigger"
 function check_root_permission() {
 	if [[ "${EUID}" = 0 ]]; then
 		return 0
