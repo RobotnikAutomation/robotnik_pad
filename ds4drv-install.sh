@@ -43,7 +43,7 @@ no_colour='\033[0m'
 
 #root permision
 
-err_str_root_permission='echo "You need root privileges try:\nsudo ${0}'
+err_str_root_permission="You need root privileges try:\nsudo ${0}"
 
 #udev
 udev_rule_file="55-ds4drv.rules"
@@ -54,8 +54,8 @@ udev_reload_rules_command="udevadm control --reload-rules && udevadm trigger"
 
 suc_str_udev_install='udev rules active'
 
-err_str_udev_copy='error copying udev rules ${udev_rule_file}'
-err_str_udev_reload='error reloading udev rules'
+err_str_udev_copy="error copying udev rules ${udev_rule_file}"
+err_str_udev_reload="error reloading udev rules"
 
 nfo_str_udev_install='Installing udev rules'
 
@@ -70,10 +70,10 @@ systemd_start_service_command="systemctl enable ${systemd_service_file}"
 
 suc_str_systemd_install='systemd service active'
 
-err_str_systemd_copy='error copying systemd service ${udev_rule_file}'
-err_str_systemd_reload='error systemd reloading daemon '
-err_str_systemd_enable='error enabling ${systemd_service_file} systemd service'
-err_str_systemd_start='error starting ${systemd_service_file} systemd service'
+err_str_systemd_copy="error copying systemd service ${udev_rule_file}"
+err_str_systemd_reload="error systemd reloading daemon"
+err_str_systemd_enable="error enabling ${systemd_service_file} systemd service"
+err_str_systemd_start="error starting ${systemd_service_file} systemd service"
 
 nfo_str_systemd_install='installing service active'
 
