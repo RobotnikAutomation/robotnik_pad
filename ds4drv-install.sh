@@ -37,6 +37,15 @@ udev_rule_destiny="/etc/udev/rules.d/${udev_rule_file}"
 
 udev_rule_copy_command="cp ${udev_rule_file} ${udev_rule_destiny}"
 udev_reload_rules_command="udevadm control --reload-rules && udevadm trigger"
+
+systemd_service_file="ds4drv.service"
+systemd_service_destiny="/etc/systemd/system/${systemd_service_file}"
+
+systemd_service_copy_command="cp ${systemd_service_file} ${systemd_service_destiny}"
+systemd_daemon_reload_command="systemctl daemon-reload"
+systemd_enable_service_command="systemctl enable ${systemd_service_file}"
+systemd_start_service_command="systemctl enable ${systemd_service_file}"
+
 function check_root_permission() {
 	if [[ "${EUID}" = 0 ]]; then
 		return 0
