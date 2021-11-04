@@ -32,8 +32,8 @@ Install PS4 controller config for ds4drv
 ```bash
 cd /etc && sudo wget https://raw.githubusercontent.com/RobotnikAutomation/robotnik_pad/master/ds4drv.conf
 ```
-cd /lib/systemd/system && sudo wget https://raw.githubusercontent.com/RobotnikAutomation/robotnik_pad/master/ds4drv.service
 ```bash
+cd /etc/systemd/system && sudo wget https://raw.githubusercontent.com/RobotnikAutomation/robotnik_pad/master/ds4drv.service
 ```
 Add the udev rules for PS4 controller
 
