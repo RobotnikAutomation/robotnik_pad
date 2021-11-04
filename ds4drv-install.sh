@@ -42,3 +42,33 @@ function check_root_permission() {
 	fi
 }
 
+function install_ds4drv() {
+	return 0
+}
+
+function install_udev_rules() {
+	return 0
+}
+
+function install_systemd_service() {
+	return 0
+}
+
+
+function main() {
+	if ! check_root_permission; then
+		return 1
+	fi
+	if ! install_ds4drv; then
+		return 1
+	fi
+	if ! install_udev_rules; then
+		return 1
+	fi
+	if ! install_systemd_service; then
+		return 1
+	fi
+}
+
+main "${@}"
+exit $?
