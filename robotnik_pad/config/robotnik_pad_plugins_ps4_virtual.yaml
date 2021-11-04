@@ -1,3 +1,4 @@
+---
 plugins:
   - Movement
   - Elevator
@@ -6,13 +7,13 @@ pad:
   type: ps4
   num_of_buttons: 14
   num_of_axes: 14
-  joy_topic: joy
+  joy_topic: $(arg joy_topic)
 
 Movement:
   type: robotnik_pad_plugins/Movement
   max_linear_speed: 1.5
   max_angular_speed: 3
-  cmd_topic_vel: pad_teleop/cmd_vel
+  cmd_topic_vel: pad_teleop_virtual/cmd_vel
   config:
     button_deadman: 5
     axis_linear_x: 1
