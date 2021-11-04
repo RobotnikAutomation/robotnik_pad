@@ -32,6 +32,16 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#Colour
+red_colour='\033[0;31m'
+green_colour='\033[0;32m'
+light_purple_colour='\033[1;35m'
+err_colour="${red_colour}"
+nfo_colour="${light_purple_colour}"
+suc_colour="${green_colour}"
+no_colour='\033[0m'
+
+#udev
 udev_rule_file="55-ds4drv.rules"
 udev_rule_destiny="/etc/udev/rules.d/${udev_rule_file}"
 
@@ -46,6 +56,20 @@ systemd_daemon_reload_command="systemctl daemon-reload"
 systemd_enable_service_command="systemctl enable ${systemd_service_file}"
 systemd_start_service_command="systemctl enable ${systemd_service_file}"
 
+function print_error() {
+	local message="${1}"
+	eval "echo -e "'"'"${err_colour}[ERROR]${no_colour}:   ${message}"'"'" 2>&1"
+}
+
+function print_info() {
+	local message="${1}"
+	eval "echo -e "'"'"${nfo_colour}[INFO]${no_colour}:    ${message}"'"'""
+}
+
+function print_success() {
+	local message="${1}"
+	eval "echo -e "'"'"${suc_colour}[SUCCESS]${no_colour}: ${message}"'"'""
+}
 function check_root_permission() {
 	if [[ "${EUID}" = 0 ]]; then
 		return 0
