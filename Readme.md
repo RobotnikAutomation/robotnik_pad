@@ -22,20 +22,20 @@ This package may depend on other Robotnik or ROS standard packages in function o
 rosdep install --from-path src --ignore-src -y -r
 ```
 
-You need to install the ds4drv pip script
+You need to install the ds4drv pip script:
 
 ```bash
 sudo pip install ds4drv
 ```
 
-Install PS4 controller config for ds4drv
+Install PS4 controller config for ds4drv:
 ```bash
 cd /etc && sudo wget https://raw.githubusercontent.com/RobotnikAutomation/robotnik_pad/master/ds4drv.conf
 ```
 ```bash
 cd /etc/systemd/system && sudo wget https://raw.githubusercontent.com/RobotnikAutomation/robotnik_pad/master/ds4drv.service
 ```
-Add the udev rules for PS4 controller
+Add the udev rules for PS4 controller:
 
 ```bash
 cd /etc/udev/rules.d/ && sudo wget https://raw.githubusercontent.com/RobotnikAutomation/robotnik_pad/master/55-ds4drv.rules
