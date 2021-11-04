@@ -7,7 +7,7 @@ pad:
   type: ps4
   num_of_buttons: 14
   num_of_axes: 14
-  joy_topic: joy_virtual
+  joy_topic: $(arg joy_topic)
 
 Movement:
   type: robotnik_pad_plugins/Movement
