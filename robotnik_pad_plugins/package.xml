@@ -1,13 +1,15 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>robotnik_pad_plugins</name>
-  <version>0.0.0</version>
+  <version>0.9.0</version>
   <description>The robotnik_pad_plugins package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
-  <maintainer email="david@todo.todo">david</maintainer>
+  <maintainer email="rnavarro@robotnik.es">Roman Navarro</maintainer>
+  <maintainer email="jgomez@robotnik.es">José Gómez</maintainer>
+  <maintainer email="ggari@robotnik.es">Guillem Gari</maintainer>
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
