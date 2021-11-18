@@ -1,15 +1,17 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>robotnik_pad</name>
-  <version>0.1.0</version>
+  <version>0.10.0</version>
   <description>The robotnik_pad package intends to standarize the pad component amongst all the robots</description>
 
-  <maintainer email="rnavarro@robotnik.es">Román Navarro</maintainer>
-  <maintainer email="ggari@robotnik.es">Guillem Garí</maintainer>
   <maintainer email="rjulia@robotnik.es">Raquel Juliá</maintainer>
+  <maintainer email="rnavarro@robotnik.es">Roman Navarro</maintainer>
   <maintainer email="jgomez@robotnik.es">José Gómez</maintainer>
+  <maintainer email="ggari@robotnik.es">Guillem Gari</maintainer>
+
 
   <author email="dredo@robotnik.es">David Redó</author>
+
 
   <license>BSD</license>
 
