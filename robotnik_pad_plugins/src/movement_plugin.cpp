@@ -72,8 +72,13 @@ void PadPluginMovement::execute(const std::vector<Button>& buttons, std::vector<
     {
       if (kinematic_mode_ == KinematicModes::Differential)
       {
-        kinematic_mode_ = KinematicModes::Omnidirectional;
+        kinematic_mode_ = KinematicModes::Lateral;
         ROS_INFO("PadPluginMovement::execute: switch mode -> from Differential to Omnidirectional");
+      }
+      else if (kinematic_mode_ == KinematicModes::Lateral)
+      {
+        kinematic_mode_ = KinematicModes::Omnidirectional;
+        ROS_INFO("PadPluginMovement::execute: switch mode -> from Lateral to Differential");
       }
       else if (kinematic_mode_ == KinematicModes::Omnidirectional)
       {
@@ -90,13 +95,8 @@ void PadPluginMovement::execute(const std::vector<Button>& buttons, std::vector<
       }
       else if (kinematic_mode_ == KinematicModes::Ackermann)
       {
-        kinematic_mode_ = KinematicModes::Lateral;
-        ROS_INFO("PadPluginMovement::execute: switch mode -> from Ackermann to Lateral");
-      }
-      else if (kinematic_mode_ == KinematicModes::Lateral)
-      {
         kinematic_mode_ = KinematicModes::Differential;
-        ROS_INFO("PadPluginMovement::execute: switch mode -> from Lateral to Differential");
+        ROS_INFO("PadPluginMovement::execute: switch mode -> from Ackermann to Lateral");
       }
     }
     if (kinematic_mode_ == KinematicModes::Ackermann)
