@@ -94,7 +94,6 @@ void PadPluginMovement::execute(const std::vector<Button>& buttons, std::vector<
         ROS_INFO("PadPluginMovement::execute: switch mode -> from Ackermann to Differential");
       }
     }
-
     if (kinematic_mode_ == KinematicModes::Ackermann)
     {
       cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_] * std::cos(axes[axis_angular_z_] * (M_PI / 2.0));
