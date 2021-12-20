@@ -90,8 +90,13 @@ void PadPluginMovement::execute(const std::vector<Button>& buttons, std::vector<
       }
       else if (kinematic_mode_ == KinematicModes::Ackermann)
       {
+        kinematic_mode_ = KinematicModes::Lateral;
+        ROS_INFO("PadPluginMovement::execute: switch mode -> from Ackermann to Lateral");
+      }
+      else if (kinematic_mode_ == KinematicModes::Lateral)
+      {
         kinematic_mode_ = KinematicModes::Differential;
-        ROS_INFO("PadPluginMovement::execute: switch mode -> from Ackermann to Differential");
+        ROS_INFO("PadPluginMovement::execute: switch mode -> from Lateral to Differential");
       }
     }
     if (kinematic_mode_ == KinematicModes::Ackermann)
@@ -100,13 +105,18 @@ void PadPluginMovement::execute(const std::vector<Button>& buttons, std::vector<
       cmd_twist_.angular.z = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_] *
                              std::sin(axes[axis_angular_z_] * (M_PI / 2.0)) / wheel_base_;
     }
+    else if (kinematic_mode_ == KinematicModes::Lateral)
+    {
+      cmd_twist_.linear.x = 0.0;
+      cmd_twist_.angular.z = current_velocity_level_ * max_angular_speed_ * axes[axis_angular_z_];
+    }
     else
     {
       cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_];
       cmd_twist_.angular.z = current_velocity_level_ * max_angular_speed_ * axes[axis_angular_z_];
     }
 
-    if (kinematic_mode_ == KinematicModes::Omnidirectional)
+    if (kinematic_mode_ == KinematicModes::Omnidirectional || kinematic_mode_ == KinematicModes::Lateral)
     {
       cmd_twist_.linear.y = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_y_];
     }

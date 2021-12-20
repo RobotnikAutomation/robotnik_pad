@@ -11,7 +11,8 @@ namespace KinematicModes
   {
       Differential = 0,
       Omnidirectional = 1,
-      Ackermann = 2
+      Ackermann = 2,
+      Lateral = 3
   };
 }
 
