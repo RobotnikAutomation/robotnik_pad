@@ -59,6 +59,16 @@ err_str_udev_reload="error reloading udev rules"
 
 nfo_str_udev_install='Installing udev rules'
 
+# config
+config_file="ds4drv.conf"
+config_file_destiny="/etc/${config_file}"
+
+config_copy_command="cp ${config_file} ${config_file_destiny}"
+
+err_str_config_copy="error copying config file ${config_file}"
+
+nfo_str_config_install="Configuring drivers"
+
 #systemd
 systemd_service_file="ds4drv.service"
 systemd_service_destiny="/etc/systemd/system/${systemd_service_file}"
@@ -66,11 +76,11 @@ systemd_service_destiny="/etc/systemd/system/${systemd_service_file}"
 systemd_service_copy_command="cp ${systemd_service_file} ${systemd_service_destiny}"
 systemd_daemon_reload_command="systemctl daemon-reload"
 systemd_enable_service_command="systemctl enable ${systemd_service_file}"
-systemd_start_service_command="systemctl enable ${systemd_service_file}"
+systemd_start_service_command="systemctl start ${systemd_service_file}"
 
 suc_str_systemd_install='systemd service active'
 
-err_str_systemd_copy="error copying systemd service ${udev_rule_file}"
+err_str_systemd_copy="error copying systemd service ${systemd_service_file}"
 err_str_systemd_reload="error systemd reloading daemon"
 err_str_systemd_enable="error enabling ${systemd_service_file} systemd service"
 err_str_systemd_start="error starting ${systemd_service_file} systemd service"
@@ -128,6 +138,13 @@ function reload_udev_rules() {
 		return 1
 	fi
 
+	return 0
+}
+
+function copy_config_file() {
+	if ! eval "${config_copy_command}"; then
+		print_error "${err_str_config_copy}"
+	fi
 	return 0
 }
 
@@ -212,6 +229,15 @@ function install_udev_rules() {
 	return 0
 }
 
+function install_config() {
+	print_info "${nfo_str_config_install}"
+
+	if ! copy_config_file; then
+		return 1
+	fi
+	return 0
+}
+
 function install_systemd_service() {
 	print_info "${nfo_str_systemd_install}"
 	if ! copy_systemd_service; then
@@ -239,6 +265,9 @@ function main() {
 		return 1
 	fi
 	if ! install_udev_rules; then
+		return 1
+	fi
+	if ! install_config; then
 		return 1
 	fi
 	if ! install_systemd_service; then
