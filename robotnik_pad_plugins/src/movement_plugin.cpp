@@ -72,13 +72,8 @@ void PadPluginMovement::execute(const std::vector<Button>& buttons, std::vector<
     {
       if (kinematic_mode_ == KinematicModes::Differential)
       {
-        kinematic_mode_ = KinematicModes::Lateral;
-        ROS_INFO("PadPluginMovement::execute: switch mode -> from Differential to Lateral");
-      }
-      else if (kinematic_mode_ == KinematicModes::Lateral)
-      {
         kinematic_mode_ = KinematicModes::Omnidirectional;
-        ROS_INFO("PadPluginMovement::execute: switch mode -> from Lateral to Omnidirectional");
+        ROS_INFO("PadPluginMovement::execute: switch mode -> from Differential to Omnidirectional");
       }
       else if (kinematic_mode_ == KinematicModes::Omnidirectional)
       {
@@ -99,16 +94,12 @@ void PadPluginMovement::execute(const std::vector<Button>& buttons, std::vector<
         ROS_INFO("PadPluginMovement::execute: switch mode -> from Ackermann to Differential");
       }
     }
+
     if (kinematic_mode_ == KinematicModes::Ackermann)
     {
       cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_] * std::cos(axes[axis_angular_z_] * (M_PI / 2.0));
       cmd_twist_.angular.z = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_] *
                              std::sin(axes[axis_angular_z_] * (M_PI / 2.0)) / wheel_base_;
-    }
-    else if (kinematic_mode_ == KinematicModes::Lateral)
-    {
-      cmd_twist_.linear.x = 0.0;
-      cmd_twist_.angular.z = current_velocity_level_ * max_angular_speed_ * axes[axis_angular_z_];
     }
     else
     {
@@ -116,7 +107,7 @@ void PadPluginMovement::execute(const std::vector<Button>& buttons, std::vector<
       cmd_twist_.angular.z = current_velocity_level_ * max_angular_speed_ * axes[axis_angular_z_];
     }
 
-    if (kinematic_mode_ == KinematicModes::Omnidirectional || kinematic_mode_ == KinematicModes::Lateral)
+    if (kinematic_mode_ == KinematicModes::Omnidirectional)
     {
       cmd_twist_.linear.y = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_y_];
     }
@@ -151,8 +142,6 @@ std::string PadPluginMovement::kinematicModeToStr(int kinematic_mode)
       return "omni";
     case KinematicModes::Ackermann:
       return "ackermann";
-    case KinematicModes::Lateral:
-      return "lateral";
     default:
       return "unknown";
   }
