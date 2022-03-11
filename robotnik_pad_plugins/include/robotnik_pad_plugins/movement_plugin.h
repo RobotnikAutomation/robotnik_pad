@@ -4,6 +4,7 @@
 #include <geometry_msgs/Twist.h>
 #include <robotnik_pad/generic_pad_plugin.h>
 #include <robotnik_pad_msgs/MovementStatus.h>
+#include <std_msgs/Int16.h>
 
 namespace KinematicModes
 {
@@ -32,12 +33,13 @@ public:
   virtual void execute(const std::vector<Button>& buttons, std::vector<float>& axes);
 
 protected:
-  int button_dead_man_, axis_linear_x_, axis_linear_y_, axis_angular_z_, button_kinematic_mode_;
+  int button_dead_man_, button_dead_man_magnetic_, axis_linear_x_, axis_linear_y_, axis_angular_z_, button_kinematic_mode_, axis_linear_magnetic_;
+  int axis_roller = 9;
   int button_speed_up_, button_speed_down_;
   double max_linear_speed_, max_angular_speed_;
-  std::string cmd_topic_vel_;
+  std::string cmd_topic_vel_, cmd_topic_vel_magnetic_;
 
-  ros::Publisher twist_pub_, pad_status_pub_;
+  ros::Publisher twist_pub_, pad_status_pub_, twist_pub_magnetic_, roller_cmd_pub_;
 
   robotnik_pad_msgs::MovementStatus movement_status_msg_;
   //! current velocity level used to compute the target velocity
@@ -49,6 +51,7 @@ protected:
   //! defines how much you can increase/decrease the max_velocity_level (Normally 0.1)
   double velocity_level_step_;
   geometry_msgs::Twist cmd_twist_;
+  std_msgs::Int16 roller_cmd_;
   int kinematic_mode_;
   //! used in ackermann mode
   double wheel_base_;
