@@ -21,7 +21,7 @@ void PadPluginElevator::initialize(const ros::NodeHandle &nh, const std::string 
   readParam(pnh_, "elevator_service_name", elevator_service_name_, elevator_service_name_, required);
 
   // Service client
-  set_elevator_client_ = nh_.serviceClient<robotnik_msgs::SetElevator>("/rb1_base/robotnik_base_control/set_elevator");
+  set_elevator_client_ = nh_.serviceClient<robotnik_msgs::SetElevator>(elevator_service_name_);
 }
 
 void PadPluginElevator::execute(const std::vector<Button> &buttons, std::vector<float> &axes)
@@ -39,7 +39,6 @@ void PadPluginElevator::execute(const std::vector<Button> &buttons, std::vector<
     {
       robotnik_msgs::SetElevator elevator_msg_srv;
       elevator_msg_srv.request.action.action = robotnik_msgs::ElevatorAction::LOWER;
-
       set_elevator_client_.call(elevator_msg_srv);
     }
   }
