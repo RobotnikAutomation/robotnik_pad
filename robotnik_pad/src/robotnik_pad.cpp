@@ -14,8 +14,8 @@ int RobotnikPad::rosSetup()
 {
   RComponent::rosSetup();
 
-  joy_sub_ = nh_.subscribe<sensor_msgs::Joy>(joy_topic_, 10, &RobotnikPad::joyCb, this);
-  addTopicsHealth(&joy_sub_, joy_topic_, 5);
+  joy_sub_ = nh_.subscribe<sensor_msgs::Joy>(joy_topic_, 1, &RobotnikPad::joyCb, this);
+  addTopicsHealth(&joy_sub_, joy_topic_, joy_timeout_);
 }
 
 int RobotnikPad::rosShutdown()
@@ -37,6 +37,7 @@ void RobotnikPad::rosReadParams()
 
   joy_topic_ = "joy";
   readParam(pnh_, "pad/joy_topic", joy_topic_, joy_topic_, not_required);
+  readParam(pnh_, "pad/joy_timeout", joy_timeout_, 5.0, not_required);
 
   std::vector<std::string> plugins_names;
 
