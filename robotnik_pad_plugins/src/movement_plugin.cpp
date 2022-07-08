@@ -44,7 +44,7 @@ void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string&
   readParam(pnh_, "config/axis_watchdog", axis_accel_watchdog_, axis_accel_watchdog_, not_required);
   watchdog_duration_ = 0.5;
   readParam(pnh_, "config/watchdog_duration", watchdog_duration_, watchdog_duration_, not_required);
-  
+
   // if not set, then ackermann mode cannot be used
   wheel_base_ = 0;
   readParam(pnh_, "wheel_base", wheel_base_, wheel_base_);
@@ -67,7 +67,7 @@ void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string&
   watchdog_activated_ = false;
 }
 
-void PadPluginMovement::execute(const std::vector<Button>& buttons, std::vector<float>& axes)
+void PadPluginMovement::execute(const std::vector<Button>& buttons, const std::vector<Axes>& axes)
 {
   if (buttons[button_dead_man_].isPressed())
   {
@@ -75,9 +75,9 @@ void PadPluginMovement::execute(const std::vector<Button>& buttons, std::vector<
     if (use_accel_watchdog_)
     {
       // If new accelerameter value is different to last, we update watchdog values
-      if (last_accel_value_ != axes[axis_accel_watchdog_])
+      if (last_accel_value_ != axes[axis_accel_watchdog_].getValue())
       {
-        last_accel_value_ = axes[axis_accel_watchdog_];
+        last_accel_value_ = axes[axis_accel_watchdog_].getValue();
         last_accel_time_ = ros::Time::now();
         watchdog_activated_ = false;
       }
@@ -100,7 +100,7 @@ void PadPluginMovement::execute(const std::vector<Button>& buttons, std::vector<
         }
       }
     }
-    
+
     if (buttons[button_speed_down_].isReleased())
     {
       current_velocity_level_ = std::max(min_velocity_level_, current_velocity_level_ - velocity_level_step_);
@@ -141,19 +141,19 @@ void PadPluginMovement::execute(const std::vector<Button>& buttons, std::vector<
 
     if (kinematic_mode_ == KinematicModes::Ackermann)
     {
-      cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_] * std::cos(axes[axis_angular_z_] * (M_PI / 2.0));
-      cmd_twist_.angular.z = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_] *
-                             std::sin(axes[axis_angular_z_] * (M_PI / 2.0)) / wheel_base_;
+      cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_].getValue() * std::cos(axes[axis_angular_z_].getValue() * (M_PI / 2.0));
+      cmd_twist_.angular.z = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_].getValue() *
+                             std::sin(axes[axis_angular_z_].getValue() * (M_PI / 2.0)) / wheel_base_;
     }
     else
     {
-      cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_];
-      cmd_twist_.angular.z = current_velocity_level_ * max_angular_speed_ * axes[axis_angular_z_];
+      cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_].getValue();
+      cmd_twist_.angular.z = current_velocity_level_ * max_angular_speed_ * axes[axis_angular_z_].getValue();
     }
 
     if (kinematic_mode_ == KinematicModes::Omnidirectional)
     {
-      cmd_twist_.linear.y = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_y_];
+      cmd_twist_.linear.y = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_y_].getValue();
     }
     else
     {

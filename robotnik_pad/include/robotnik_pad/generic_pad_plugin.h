@@ -2,6 +2,7 @@
 #define GENERIC_PAD_PLUGIN_H_
 
 #include <robotnik_pad/button.h>
+#include <robotnik_pad/axes.h>
 #include <ros/ros.h>
 #include <boost/scoped_ptr.hpp>
 #include <vector>
@@ -15,7 +16,7 @@ public:
 
 public:
   virtual void initialize(const ros::NodeHandle& nh, const std::string& plugin_ns) = 0;
-  virtual void execute(const std::vector<Button>& buttons, std::vector<float>& axes) = 0;
+  virtual void execute(const std::vector<Button>& buttons, const std::vector<Axes>& axes) = 0;
   virtual ~GenericPadPlugin()
   {
   }
@@ -53,7 +54,7 @@ protected:
 
 protected:
   std::vector<Button> buttons_;
-  std::vector<float> axes_;
+  std::vector<Axes> axes_;
   ros::NodeHandle pnh_;
   ros::NodeHandle nh_;
 };

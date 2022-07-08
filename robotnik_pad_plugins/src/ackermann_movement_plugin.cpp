@@ -47,7 +47,7 @@ void PadPluginAckermannMovement::initialize(const ros::NodeHandle& nh, const std
   movement_status_msg_ = robotnik_pad_msgs::MovementStatus();
 }
 
-void PadPluginAckermannMovement::execute(const std::vector<Button>& buttons, std::vector<float>& axes)
+void PadPluginAckermannMovement::execute(const std::vector<Button>& buttons, const std::vector<Axes>& axes)
 {
   if (buttons[button_dead_man_].isPressed())
   {
@@ -62,8 +62,8 @@ void PadPluginAckermannMovement::execute(const std::vector<Button>& buttons, std
       ROS_INFO("PadPluginAckermannMovement::execute: speed up -> velocity level = %.1f%%", current_velocity_level_ * 100.0);
     }
 
-    cmd_ackermann_.speed = current_velocity_level_ * max_speed_ * axes[axis_linear_x_];
-    cmd_ackermann_.steering_angle = max_steering_angle_ * axes[axis_angular_z_];
+    cmd_ackermann_.speed = current_velocity_level_ * max_speed_ * axes[axis_linear_x_].getValue();
+    cmd_ackermann_.steering_angle = max_steering_angle_ * axes[axis_angular_z_].getValue();
 
     ackermann_pub_.publish(cmd_ackermann_);
   }

@@ -15,7 +15,7 @@ public:
   ~PadPluginAckermannMovement();
 
   virtual void initialize(const ros::NodeHandle& nh, const std::string& plugin_ns);
-  virtual void execute(const std::vector<Button>& buttons, std::vector<float>& axes);
+  virtual void execute(const std::vector<Button>& buttons, const std::vector<Axes>& axes);
 
 protected:
   int button_dead_man_, axis_linear_x_, axis_linear_y_, axis_angular_z_;
