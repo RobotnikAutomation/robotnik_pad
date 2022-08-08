@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   robotnik_msgs
   rcomponent
   sensor_msgs
+  std_msgs
   geometry_msgs
   ackermann_msgs
   pluginlib

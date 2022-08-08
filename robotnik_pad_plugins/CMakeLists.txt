@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   pluginlib
   robotnik_pad
   robotnik_pad_msgs
+  std_msgs
 )
 
 
@@ -32,6 +33,7 @@ add_library(robotnik_pad_plugins
   src/movement_plugin.cpp
   src/elevator_plugin.cpp
   src/ackermann_movement_plugin.cpp
+  src/rising_plugin.cpp
 )
 
 add_dependencies(robotnik_pad_plugins ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
