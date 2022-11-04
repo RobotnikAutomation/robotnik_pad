@@ -31,6 +31,7 @@ namespace pad_plugins
 
         readParam(pnh_, "position_increment", position_increment_, position_increment_, required);
         readParam(pnh_, "position_increment_limit", position_increment_limit_, position_increment_limit_, required);
+        readParam(pnh_, "zoom_increment", zoom_increment_, zoom_increment_, required);
         readParam(pnh_, "min_pan_position", min_pan_position_, min_pan_position_, required);
         readParam(pnh_, "max_pan_position", max_pan_position_, max_pan_position_, required);
         readParam(pnh_, "min_tilt_position", min_tilt_position_, min_tilt_position_, required);
@@ -195,18 +196,18 @@ namespace pad_plugins
         }
 
         // Temporarily disabled
-        /* 
+        
         if (buttons[button_zoom_in_].isReleased()){
-            zoom_position_  =  zoom_position_ + (current_position_increment_*1000.0);
+            zoom_position_  =  zoom_position_ + (zoom_increment_);
         }
         if (buttons[button_zoom_out_].isReleased()){
-            zoom_position_  =  zoom_position_ - (current_position_increment_*1000.0);
+            zoom_position_  =  zoom_position_ - (zoom_increment_);
         }
-        */
+        
 
         cmd_ptz.pan = pan_position_;
         cmd_ptz.tilt = tilt_position_;
-        //cmd_ptz.zoom = zoom_position_;
+        cmd_ptz.zoom = zoom_position_;
         cmd_ptz.relative = false;
         cmd_ptz.mode="position";
         
@@ -256,19 +257,21 @@ namespace pad_plugins
             pan_speed_ = 0;
         }
 
-        // Temporarily disabled
-        /* 
-        if (buttons[button_zoom_in_].isReleased()){
-            zoom_position_  =  zoom_position_ + (current_position_increment_*1000.0);
+
+        if (buttons[button_zoom_in_].isPressed()){
+            zoom_position_  =  zoom_increment_;
         }
-        if (buttons[button_zoom_out_].isReleased()){
-            zoom_position_  =  zoom_position_ - (current_position_increment_*1000.0);
+        if (buttons[button_zoom_out_].isPressed()){
+            zoom_position_  = -zoom_increment_;
         }
-        */
+        
+        if (!buttons[button_zoom_in_].isPressed() && !buttons[button_zoom_out_].isPressed()){
+            zoom_position_ = 0;
+        }
 
         cmd_ptz.pan = pan_speed_;
         cmd_ptz.tilt = tilt_speed_;
-        //cmd_ptz.zoom = zoom_position_;
+        cmd_ptz.zoom = zoom_position_;
         cmd_ptz.relative = true;
         cmd_ptz.mode="velocity";
 

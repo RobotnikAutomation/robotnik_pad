@@ -50,6 +50,7 @@ protected:
   double current_position_increment_;
   double position_increment_;
   double position_increment_limit_;
+  double zoom_increment_;
   double min_pan_position_, max_pan_position_;
   double min_tilt_position_, max_tilt_position_;
 
