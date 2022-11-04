@@ -2,6 +2,7 @@
 #define PAD_PLUGIN_POI_H_
 
 #include <robotnik_msgs/SetString.h>
+#include <std_srvs/Trigger.h>
 #include <robotnik_pad/generic_pad_plugin.h>
 
 namespace pad_plugins

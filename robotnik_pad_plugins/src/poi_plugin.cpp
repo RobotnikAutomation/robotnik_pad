@@ -28,7 +28,7 @@ namespace pad_plugins{
         counter = 0;
 
         // Service client
-       save_robot_poi_client_ = nh_.serviceClient<robotnik_msgs::SetString>(poi_service_name_);
+       save_robot_poi_client_ = nh_.serviceClient<std_srvs::Trigger>(poi_service_name_);
 
     }
 
@@ -43,7 +43,7 @@ namespace pad_plugins{
 
                 toggle = false;
 
-                robotnik_msgs::SetString poi_trigger;
+                std_srvs::Trigger poi_trigger;
 
                 if (save_robot_poi_client_.call(poi_trigger)){
 
