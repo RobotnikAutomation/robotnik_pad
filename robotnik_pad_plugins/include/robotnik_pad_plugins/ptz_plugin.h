@@ -64,6 +64,7 @@ protected:
   double home_tilt_position_;
   double home_zoom_position_;
 
+  bool set_position_mode_;
   int ptz_mode_;
 
   ros::Publisher ptz_pub_;
