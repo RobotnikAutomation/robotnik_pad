@@ -41,6 +41,7 @@ void PadPluginElevator::execute(const std::vector<Button>& buttons, std::vector<
     {
       robotnik_msgs::SetElevator elevator_msg_srv;
       elevator_msg_srv.request.action.action = robotnik_msgs::ElevatorAction::LOWER;
+
       ROS_INFO_NAMED("PadPluginElevator", "PadPluginElevator::execute: Lowering...");
 
       if (set_elevator_client_.call(elevator_msg_srv) != true || elevator_msg_srv.response.ret != true)
