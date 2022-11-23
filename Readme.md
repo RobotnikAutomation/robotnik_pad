@@ -21,24 +21,31 @@ This package may depend on other Robotnik or ROS standard packages in function o
 # located in the workspace folder
 rosdep install --from-path src --ignore-src -y -r
 ```
+### ds4drv automatic install
+in order to install the ds4drv and its components you can use the installer:
+```bash
+sudo ./ds4drv-install.sh
+```
+Now you your system should be ready
 
-You need to install the ds4drv pip script
+### ds4drv manual install
+You need to install the ds4drv pip script:
 
-```console
+```bash
 sudo pip install ds4drv
 ```
 
-Install PS4 controller config for ds4drv
-```console
+Install PS4 controller config for ds4drv:
+```bash
 cd /etc && sudo wget https://raw.githubusercontent.com/RobotnikAutomation/robotnik_pad/master/ds4drv.conf
 ```
-```console
-cd /lib/systemd/system && sudo wget https://raw.githubusercontent.com/RobotnikAutomation/robotnik_pad/master/ds4drv.service
+```bash
+cd /etc/systemd/system && sudo wget https://raw.githubusercontent.com/RobotnikAutomation/robotnik_pad/master/ds4drv.service
 ```
-Add the udev rules for PS4 controller
+Add the udev rules for PS4 controller:
 
-```console
-cd && sudo gedit /etc/udev/rules.d/55-ds4drv.rules
+```bash
+cd /etc/udev/rules.d/ && sudo wget https://raw.githubusercontent.com/RobotnikAutomation/robotnik_pad/master/55-ds4drv.rules
 ```
 And paste the following text:
 ```
@@ -46,13 +53,20 @@ KERNEL=="js[0-9]*", SUBSYSTEM=="input", SYMLINK+="input/js_base", ATTRS{name}=="
 ```
 
 Enable the execution of the ds4drv service on boot:
-```console
+```bash
 sudo systemctl daemon-reload
 ```
-```console
+```bash
 sudo systemctl enable ds4drv.service
 ```
-You will need to restart your computer for finishing this step, but you can wait until the end of the installation.
+Now the ds4drv is loaded on boot.
+
+To enable the joystick without rebooting:
+
+```bash
+sudo udevadm control --reload-rules && sudo udevadm trigger
+sudo systemctl start ds4drv.service
+```
 
 ---
 ## 1. robotnik_pad_node
@@ -112,28 +126,29 @@ Available plugins:
 This an example of a config file loading a single plugin:
 
 ```yaml
-
+---
 plugins:
- - Movement
+  - Movement
 
 pad:
- type: ps4
- num_of_buttons: 14
- num_of_axes: 14
+  type: ps4
+  num_of_buttons: 14
+  num_of_axes: 14
+  joy_topic: joy
 
 Movement:
- type: robotnik_pad_plugins/Movement
- max_linear_speed: 1.5
- max_angular_speed: 3.0
- cmd_topic_vel: pad_teleop/cmd_vel
- config:
-   button_deadman: 5
-   axis_linear_x: 1
-   axis_linear_y: 0
-   axis_angular_z: 2
-   button_speed_up: 3
-   button_speed_down: 1
-   button_kinematic_mode: 7
+  type: robotnik_pad_plugins/Movement
+  max_linear_speed: 1.5
+  max_angular_speed: 3.0
+  cmd_topic_vel: pad_teleop/cmd_vel
+  config:
+    button_deadman: 5
+    axis_linear_x: 1
+    axis_linear_y: 0
+    axis_angular_z: 2
+    button_speed_up: 3
+    button_speed_down: 1
+    button_kinematic_mode: 7
 ```
 
 First of all you need to define a list containing the different plugins you want to load. Then, for each of the plugins you want to load, you should specify its parameters.

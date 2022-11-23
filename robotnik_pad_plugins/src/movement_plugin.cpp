@@ -13,6 +13,7 @@ PadPluginMovement::~PadPluginMovement()
 void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string& plugin_ns)
 {
   bool required = true;
+  bool not_required = false;
   pnh_ = ros::NodeHandle(nh, plugin_ns);
   nh_ = ros::NodeHandle();
   button_dead_man_ = 5;
@@ -35,6 +36,15 @@ void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string&
   readParam(pnh_, "max_angular_speed", max_angular_speed_, max_angular_speed_, required);
   cmd_topic_vel_ = "cmd_vel";
   readParam(pnh_, "cmd_topic_vel", cmd_topic_vel_, cmd_topic_vel_, required);
+
+  //watchdog params
+  use_accel_watchdog_ = false;
+  readParam(pnh_, "config/use_accel_watchdog", use_accel_watchdog_, use_accel_watchdog_, not_required);
+  axis_accel_watchdog_ = 8;
+  readParam(pnh_, "config/axis_watchdog", axis_accel_watchdog_, axis_accel_watchdog_, not_required);
+  watchdog_duration_ = 0.5;
+  readParam(pnh_, "config/watchdog_duration", watchdog_duration_, watchdog_duration_, not_required);
+  
   // if not set, then ackermann mode cannot be used
   wheel_base_ = 0;
   readParam(pnh_, "wheel_base", wheel_base_, wheel_base_);
@@ -51,12 +61,46 @@ void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string&
   cmd_twist_ = geometry_msgs::Twist();
   movement_status_msg_ = robotnik_pad_msgs::MovementStatus();
   kinematic_mode_ = KinematicModes::Differential;
+
+  last_accel_time_ = ros::Time::now();
+  last_accel_value_ = 0.0;
+  watchdog_activated_ = false;
 }
 
 void PadPluginMovement::execute(const std::vector<Button>& buttons, std::vector<float>& axes)
 {
   if (buttons[button_dead_man_].isPressed())
   {
+    // We monitor watchdog
+    if (use_accel_watchdog_)
+    {
+      // If new accelerameter value is different to last, we update watchdog values
+      if (last_accel_value_ != axes[axis_accel_watchdog_])
+      {
+        last_accel_value_ = axes[axis_accel_watchdog_];
+        last_accel_time_ = ros::Time::now();
+        watchdog_activated_ = false;
+      }
+      else
+      {
+        if (watchdog_activated_)
+        {
+          ROS_WARN_THROTTLE(5, "PadPluginMovement::execute: Command discarded by accelerometer watchdog!");
+          return;
+        }
+        // If watchdog is expired, we stop the robot
+        if (ros::Time::now() - last_accel_time_ > ros::Duration(watchdog_duration_))
+        {
+          ROS_WARN("PadPluginMovement::execute: Accelerometer watchdog timedout!");
+          cmd_twist_.linear.x = 0.0;
+          cmd_twist_.angular.z = 0.0;
+          twist_pub_.publish(cmd_twist_);
+          watchdog_activated_ = true;
+          return;
+        }
+      }
+    }
+    
     if (buttons[button_speed_down_].isReleased())
     {
       current_velocity_level_ = std::max(min_velocity_level_, current_velocity_level_ - velocity_level_step_);

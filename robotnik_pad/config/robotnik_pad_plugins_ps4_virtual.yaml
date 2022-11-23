@@ -1,34 +1,19 @@
+---
 plugins:
   - Movement
   - Elevator
-  - Ackermann
 
 pad:
   type: ps4
   num_of_buttons: 14
   num_of_axes: 14
-  joy_topic: joy
-  joy_timeout: 5
-
-AckermannMovement:
-  type: robotnik_pad_plugins/AckermannMovement
-  max_speed: 1.5
-  max_steering_angle: 0.6
-  cmd_topic_vel: pad_teleop/ack_cmd_vel
-  config:
-    button_deadman: 0
-    axis_linear_x: 0
-    axis_linear_y: 1
-    axis_angular_z: 2
-    button_speed_up: 2
-    button_speed_down: 3
-
+  joy_topic: $(arg joy_topic)
 
 Movement:
   type: robotnik_pad_plugins/Movement
   max_linear_speed: 1.5
-  cmd_topic_vel: pad_teleop/cmd_vel
-  wheel_base: 1.375
+  max_angular_speed: 3
+  cmd_topic_vel: pad_teleop_virtual/cmd_vel
   config:
     button_deadman: 5
     axis_linear_x: 1
@@ -37,9 +22,6 @@ Movement:
     button_speed_up: 3
     button_speed_down: 1
     button_kinematic_mode: 7
-    use_accel_watchdog: true
-    axis_watchdog: 8
-    watchdog_duration: 0.5
 
 Elevator:
   type: robotnik_pad_plugins/Elevator

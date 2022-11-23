@@ -8,6 +8,9 @@ pad:
   type: ps4
   num_of_buttons: 14
   num_of_axes: 14
+  joy_topic: joy
+  joy_timeout: 5.0
+
 
 Movement:
   type: robotnik_pad_plugins/Movement
@@ -22,6 +25,9 @@ Movement:
     button_speed_up: 3
     button_speed_down: 1
     button_kinematic_mode: 7
+    use_accel_watchdog: true
+    axis_watchdog: 8
+    watchdog_duration: 0.5
 
 Elevator:
   type: robotnik_pad_plugins/Elevator

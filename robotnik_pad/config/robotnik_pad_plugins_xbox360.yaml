@@ -6,6 +6,7 @@ pad:
   type: xbox360
   num_of_buttons: 17
   num_of_axes: 4
+  joy_topic: joy
 
 Movement:
   type: robotnik_pad_plugins/Movement
