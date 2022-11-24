@@ -380,7 +380,7 @@ namespace pad_plugins
                 cmd_ptz.pan = 0.0;
                 cmd_ptz.tilt = 0.0;
                 cmd_ptz.zoom = 0.0;
-                cmd_ptz.relative = false;
+                cmd_ptz.relative = true;
                 cmd_ptz.mode="velocity";
                 publishPtz(cmd_ptz);
             }
