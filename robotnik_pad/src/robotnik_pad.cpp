@@ -16,11 +16,15 @@ int RobotnikPad::rosSetup()
 
   joy_sub_ = nh_.subscribe<sensor_msgs::Joy>(joy_topic_, 1, &RobotnikPad::joyCb, this);
   addTopicsHealth(&joy_sub_, joy_topic_, joy_timeout_);
+
+  return rcomponent::OK;
 }
 
 int RobotnikPad::rosShutdown()
 {
   RComponent::rosShutdown();
+
+  return rcomponent::OK;
 }
 
 void RobotnikPad::rosReadParams()
@@ -47,6 +51,7 @@ void RobotnikPad::rosReadParams()
 
 int RobotnikPad::setup()
 {
+  return rcomponent::OK;
 }
 
 void RobotnikPad::rosPublish()
