@@ -71,6 +71,7 @@ void PadPluginMovement::execute(const std::vector<Button>& buttons, const std::v
 {
   if (buttons[button_dead_man_].isPressed())
   {
+    // ROS_WARN("DEAD MAN BUTTON PRESSED");
     // We monitor watchdog
     if (use_accel_watchdog_)
     {
