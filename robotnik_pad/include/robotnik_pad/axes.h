@@ -1,51 +1,32 @@
 #ifndef _AXES_
 #define _AXES_
 
+
+#include <iostream>
 //! Class to save the state of the buttons
 class Axes
 {
-  int is_pressed_pos, is_pressed_neg;
-  bool is_released_pos, is_released_neg;
-	float axis_value;
+  int is_pressed_pos{0};
+  int is_pressed_neg{0};
+  bool is_released_pos{false};
+  bool is_released_neg{false};
+	float axis_value{0.0};
 
 public:
-  Axes()
-  {
-    is_pressed_pos = 0;
-		is_pressed_neg = 0;
-    is_released_pos = false;
-		is_released_neg = false;
-		axis_value = 0.0;
-  }
+  Axes(){}
 
-  //! Set the button as 'pressed'/'released'
   void press(float value)
   {
-    if (is_pressed_pos and !(value > 0))
-    {
-      is_released_pos = true;
-    }
-    else if (is_released_pos and (value > 0))
-			is_released_pos = false;
+    bool isValuePositive = (value > 0);
+    bool isValueNegative = (value < 0);
 
-		if (is_pressed_neg and !(value < 0))
-		{
-			is_released_neg = true;
-		}
-		else if (is_released_neg and (value < 0))
-			is_released_neg = false;
-
-		if (value > 0)
-			is_pressed_pos = true;
-		else
-			is_pressed_pos = false;
-
-		if (value < 0)
-			is_pressed_neg = true;
-		else
-			is_pressed_neg = false;
-
-		axis_value = value;
+    is_released_pos = (is_pressed_pos && !isValuePositive);
+    is_released_neg = (is_pressed_neg && !isValueNegative);
+    
+		is_pressed_pos = isValuePositive;
+		is_pressed_neg = isValueNegative;
+		
+    axis_value = value;
   }
 
   int isPressedPos() const
