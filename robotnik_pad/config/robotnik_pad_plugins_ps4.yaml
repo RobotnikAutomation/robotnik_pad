@@ -35,6 +35,8 @@ SafetyMovement:
   type: robotnik_pad_plugins/SafetyMovement
   max_linear_speed: 1.5
   max_angular_speed: 3
+  unsafe_max_linear_speed: 0.8
+  unsafe_max_angular_speed: 1
   cmd_topic_vel: pad_teleop/cmd_vel
   cmd_topic_vel_unsafe: pad_teleop/cmd_vel_unsafe
   config:
@@ -76,14 +78,14 @@ Poi:
 Ptz:
   type: robotnik_pad_plugins/Ptz
   cmd_topic_ptz: ptz/command
-  
+
   speed_increment: 0.5
   speed_limit: 3.14
 
   home_pan_position: 0.0
   home_tilt_position: 0.0
   home_zoom_position: 0.0
-  
+
   position_increment: 0.1
   position_increment_limit: 0.5
   min_pan_position: -3.14
@@ -99,8 +101,8 @@ Ptz:
     button_home: 12
     button_pan:  10
     button_tilt: 9
-    button_zoom_in: 4 
+    button_zoom_in: 4
     button_zoom_out: 6
-    button_increment_up: 2 
+    button_increment_up: 2
     button_increment_down: 0
     #button_ptz_mode: 8
