@@ -36,10 +36,10 @@ void PadPluginSafetyMovement::initialize(const ros::NodeHandle& nh, const std::s
   readParam(pnh_, "max_linear_speed", max_linear_speed_, max_linear_speed_, required);
   max_angular_speed_ = 3.0;
   readParam(pnh_, "max_angular_speed", max_angular_speed_, max_angular_speed_, required);
-  unsafe_max_linear_speed_ = 0.8;
-  readParam(pnh_, "unsafe_max_linear_speed", unsafe_max_linear_speed_, unsafe_max_linear_speed_, required);
-  unsafe_max_angular_speed_ = 1.0;
-  readParam(pnh_, "unsafe_max_angular_speed", unsafe_max_angular_speed_, unsafe_max_angular_speed_, required);
+  max_linear_speed_unsafe_ = 0.8;
+  readParam(pnh_, "max_linear_speed_unsafe", max_linear_speed_unsafe_, max_linear_speed_unsafe_, required);
+  max_angular_speed_unsafe_ = 1.0;
+  readParam(pnh_, "max_angular_speed_unsafe", max_angular_speed_unsafe_, max_angular_speed_unsafe_, required);
   cmd_topic_vel_ = "cmd_vel";
   readParam(pnh_, "cmd_topic_vel", cmd_topic_vel_, cmd_topic_vel_, required);
   cmd_topic_vel_unsafe_ = "cmd_vel_unsafe";
@@ -152,19 +152,19 @@ void PadPluginSafetyMovement::execute(const std::vector<Button>& buttons, std::v
 
       if (kinematic_mode_ == SafetyKinematicModes::Ackermann)
       {
-        cmd_twist_.linear.x = current_velocity_level_ * unsafe_max_linear_speed_ * axes[axis_linear_x_] * std::cos(axes[axis_angular_z_] * (M_PI / 2.0));
-        cmd_twist_.angular.z = current_velocity_level_ * unsafe_max_linear_speed_ * axes[axis_linear_x_] *
+        cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_unsafe_ * axes[axis_linear_x_] * std::cos(axes[axis_angular_z_] * (M_PI / 2.0));
+        cmd_twist_.angular.z = current_velocity_level_ * max_linear_speed_unsafe_ * axes[axis_linear_x_] *
                               std::sin(axes[axis_angular_z_] * (M_PI / 2.0)) / wheel_base_;
       }
       else
       {
-        cmd_twist_.linear.x = current_velocity_level_ * unsafe_max_linear_speed_ * axes[axis_linear_x_];
-        cmd_twist_.angular.z = current_velocity_level_ * unsafe_max_angular_speed_ * axes[axis_angular_z_];
+        cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_unsafe_ * axes[axis_linear_x_];
+        cmd_twist_.angular.z = current_velocity_level_ * max_angular_speed_unsafe_ * axes[axis_angular_z_];
       }
 
       if (kinematic_mode_ == SafetyKinematicModes::Omnidirectional)
       {
-        cmd_twist_.linear.y = current_velocity_level_ * unsafe_max_linear_speed_ * axes[axis_linear_y_];
+        cmd_twist_.linear.y = current_velocity_level_ * max_linear_speed_unsafe_ * axes[axis_linear_y_];
       }
       else
       {
