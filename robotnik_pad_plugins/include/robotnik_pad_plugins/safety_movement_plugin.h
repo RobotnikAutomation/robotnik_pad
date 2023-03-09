@@ -1,0 +1,72 @@
+#ifndef PAD_PLUGIN_SAFETY_MOVEMENT_H_
+#define PAD_PLUGIN_SAFETY_MOVEMENT_H_
+
+#include <geometry_msgs/Twist.h>
+#include <robotnik_pad/generic_pad_plugin.h>
+#include <robotnik_pad_msgs/MovementStatus.h>
+
+namespace SafetyKinematicModes
+{
+  enum SafetyKinematicMode
+  {
+      Differential = 0,
+      Omnidirectional = 1,
+      Ackermann = 2
+  };
+}
+
+typedef SafetyKinematicModes::SafetyKinematicMode SafetyKinematicMode;
+
+namespace pad_plugins
+{
+class PadPluginSafetyMovement : public GenericPadPlugin
+{
+public:
+  // Probably this should be stablish in generic_pad_plugin
+
+  PadPluginSafetyMovement();
+  ~PadPluginSafetyMovement();
+
+  virtual void initialize(const ros::NodeHandle& nh, const std::string& plugin_ns);
+  virtual void execute(const std::vector<Button>& buttons, std::vector<float>& axes);
+
+protected:
+  int button_dead_man_, button_disable_safety_, axis_linear_x_, axis_linear_y_, axis_angular_z_, button_kinematic_mode_;
+  int button_speed_up_, button_speed_down_;
+  double max_linear_speed_, max_angular_speed_;
+  std::string cmd_topic_vel_unsafe_;
+  std::string cmd_topic_vel_;
+
+  ros::Publisher twist_pub_, twist_unsafe_pub_, pad_status_pub_;
+
+  robotnik_pad_msgs::MovementStatus movement_status_msg_;
+  //! current velocity level used to compute the target velocity
+  double current_velocity_level_;
+  //! max velocity level allowed (Normally 1.0)
+  double max_velocity_level_;
+  //! min velocity level allowed (Normally 0.1 -> the 10% of max speed level)
+  double min_velocity_level_;
+  //! defines how much you can increase/decrease the max_velocity_level (Normally 0.1)
+  double velocity_level_step_;
+  geometry_msgs::Twist cmd_twist_;
+  int kinematic_mode_;
+  //! used in ackermann mode
+  double wheel_base_;
+
+  //! flag to use accelerometer as watchdog
+  bool use_accel_watchdog_;
+  //! accelerometer axis used for watchdog
+  int axis_accel_watchdog_;
+  //! time to activate the watchdog
+  double watchdog_duration_;
+  //! last acceleration value
+  double last_accel_value_;
+  //! last time new accelerometer value read
+  ros::Time last_accel_time_;
+  //! flag to monitor if the robot watchdog is activated
+  bool watchdog_activated_;
+protected:
+  std::string kinematicModeToStr(int kinematic_mode);
+};
+}  // namespace pad_plugins
+#endif  // PAD_PLUGIN_SAFETY_ELEVATOR_H_

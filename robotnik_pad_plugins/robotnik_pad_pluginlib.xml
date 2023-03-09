@@ -2,6 +2,9 @@
     <class name="robotnik_pad_plugins/Movement" type="pad_plugins::PadPluginMovement" base_class_type="pad_plugins::GenericPadPlugin">
         <description>This is the Pad movement plugin.</description>
     </class>
+    <class name="robotnik_pad_plugins/SafetyMovement" type="pad_plugins::PadPluginSafetyMovement" base_class_type="pad_plugins::GenericPadPlugin">
+        <description>This is the Pad safety movement plugin.</description>
+    </class>
     <class name="robotnik_pad_plugins/Elevator" type="pad_plugins::PadPluginElevator" base_class_type="pad_plugins::GenericPadPlugin">
         <description>This is the Pad elevator plugin.</description>
     </class>
@@ -13,5 +16,8 @@
     </class> 
     <class name="robotnik_pad_plugins/Ptz" type="pad_plugins::PadPluginPtz" base_class_type="pad_plugins::GenericPadPlugin">
         <description>This is the Pad PTZ plugin.</description>
+    </class>
+    <class name="robotnik_pad_plugins/BlkArc" type="pad_plugins::PadPluginBlkArc" base_class_type="pad_plugins::GenericPadPlugin">
+        <description>This is the BLK ARC plugin.</description>
     </class>
 </library>
