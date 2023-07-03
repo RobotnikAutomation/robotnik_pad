@@ -175,11 +175,11 @@ namespace pad_plugins
                 }
 
                 if (right_arrow.isPressed()){
-                    pan_position_ = pan_position_ + current_position_increment_;  
+                    pan_position_ = pan_position_ - current_position_increment_; 
                 }
 
                 if (left_arrow.isPressed()){
-                    pan_position_ = pan_position_ - current_position_increment_;    
+                    pan_position_ = pan_position_ + current_position_increment_;    
                 }
 
                 tilt_position_ = std::max(std::min(tilt_position_, max_tilt_position_), min_tilt_position_);
@@ -241,11 +241,11 @@ namespace pad_plugins
         }
 
         if (right_arrow.isPressed()){
-            pan_speed_ = current_speed_;   
+            pan_speed_ = - current_speed_;   
         }
 
         if (left_arrow.isPressed()){
-            pan_speed_ = - current_speed_;
+            pan_speed_ = current_speed_;
         }
 
 
