@@ -21,6 +21,10 @@ void PadPluginRising::initialize(const ros::NodeHandle& nh, const std::string& p
   flipper_f_read.data = 0.0;
   readParam(pnh_, "config/button_deadman", button_dead_man_, button_dead_man_, required);
   readParam(pnh_, "config/button_kinematic_mode", button_kinematic_mode_, button_kinematic_mode_, required);
+  axis_frontflipper_ = 1;
+  readParam(pnh_, "config/axis_frontflipper", axis_frontflipper_, axis_frontflipper_, required);
+  axis_backflipper_ = 5;
+  readParam(pnh_, "config/axis_backflipper", axis_backflipper_, axis_backflipper_, required);
   axis_linear_x_ = 1;
   readParam(pnh_, "config/axis_linear_x", axis_linear_x_, axis_linear_x_, required);
   axis_linear_y_ = 0;
@@ -51,8 +55,9 @@ wheel_base_ = 0;
 	left_wheel_pub_ = nh_.advertise<std_msgs::Float64>("front_left_master_wheel_joint_controller/command", 1);
   front_flipper_wheel_pub_ = nh_.advertise<std_msgs::Float64>("front_flipper_joint_controller/command", 1);
 	back_flipper_wheel_pub_ = nh_.advertise<std_msgs::Float64>("back_flipper_joint_controller/command", 1);
+  test_pub_ = nh_.advertise<sensor_msgs::JointState>("/test", 1);
   // SUBSCRIBER JOINT STATES
-  joint_states_sub_ = nh_.subscribe("joint_states", 100, &PadPluginRising::jointStatesCallback, this);
+  joint_states_sub_ = nh_.subscribe("joint_states", 1, &PadPluginRising::jointStatesCallback, this);
 
 
   pad_status_pub_ = pnh_.advertise<robotnik_pad_msgs::MovementStatus>("status", 10);
@@ -79,6 +84,9 @@ void PadPluginRising::execute(const std::vector<Button>& buttons, std::vector<fl
   flipper_b.data = flipper_b_read.data ;
   flipper_f.data = flipper_f_read.data ;
 
+  //flipper_f.data = msg_test.position[1]; // + float(axes[1])*float(0.500000000000000000000);
+  //ifront_flipper_wheel_pub_.publish(flipper_f_read);
+
   if (buttons[button_dead_man_].isPressed())
   {
     if (buttons[button_speed_down_].isReleased())
@@ -95,11 +103,26 @@ void PadPluginRising::execute(const std::vector<Button>& buttons, std::vector<fl
     if (buttons[7].isPressed()){
     
    
+      if(axes[axis_backflipper_] != 0.0){
+        flipper_b.data = flipper_b_read.data - axes[axis_backflipper_]*0.5;
+        //flipper_b.data = -msg_test.position[0] - axes[5]*0.5;
+        //flipper_b.data = msg_test.position[0] ;
+        back_flipper_wheel_pub_.publish(flipper_b);
+      }
+      if(axes[axis_frontflipper_] != 0.0){
+        flipper_f.data = flipper_f_read.data + axes[axis_frontflipper_]*0.5;
+        //flipper_f.data = msg_test.position[1] + axes[1]*0.5;
+        //flipper_f.data = msg_test.position[1];
+        front_flipper_wheel_pub_.publish(flipper_f);
+      } //|| axes[1] !=0.0 ){
       //ROS_INFO("Variable f_read: %f", flipper_f_read.data);
-      flipper_b.data = flipper_b_read.data - axes[5]*5;
-      flipper_f.data = flipper_f_read.data + axes[1]*5;
-      ROS_INFO("Variable b: %f", flipper_b.data);
+      //flipper_b.data = flipper_b_read.data - axes[5]*0.5;
+      //flipper_f.data = flipper_f_read.data + axes[1]*0.5;
+      //ROS_INFO("Variable b: %f", flipper_b.data);
       //ROS_INFO("MOVING FLIPPERS");
+      //back_flipper_wheel_pub_.publish(flipper_b);
+      //front_flipper_wheel_pub_.publish(flipper_f);
+      
 
 
     }else{
@@ -119,28 +142,33 @@ void PadPluginRising::execute(const std::vector<Button>& buttons, std::vector<fl
     // ----------------------------------------------
     // ----------------------------------------------
     cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_];
-    cmd_twist_.angular.z = current_velocity_level_ * max_angular_speed_ * (-axes[axis_angular_z_]);
+    cmd_twist_.angular.z = current_velocity_level_ * max_angular_speed_ * (axes[axis_angular_z_]*2);
 
-    traction_l.data = axes[5]*30 + axes[2]*20;
-		traction_r.data = axes[5]*-30 + axes[2]*20;
+   //traction_l.data = axes[axis_backflipper_]*30 + axes[axis_angular_z_]*20;
+   //traction_r.data = axes[axis_backflipper_]*-30 + axes[axis_angular_z_]*20;
+     traction_l.data = axes[5]*30 + axes[2]*20;
+     traction_r.data = axes[5]*-30 + axes[2]*20;
+    //ROS_INFO("axis_backflipper_: %f", axis_backflipper_);
+    //ROS_INFO("dentro");
     right_wheel_pub_.publish(traction_r);
     left_wheel_pub_.publish(traction_l);
-  }
+  
+    }
 
-      back_flipper_wheel_pub_.publish(flipper_b);
-      front_flipper_wheel_pub_.publish(flipper_f);
+      // back_flipper_wheel_pub_.publish(flipper_b);
+     // front_flipper_wheel_pub_.publish(flipper_f);
       twist_pub_.publish(cmd_twist_);
   }
   else if (buttons[button_dead_man_].isReleased() )
   {
- 
+    //ROS_INFO("fuera");
     cmd_twist_.linear.x = 0.0;
     cmd_twist_.angular.z = 0.0;
     traction_l.data = 0.0;
     traction_r.data = 0.0;
 
-    back_flipper_wheel_pub_.publish(flipper_b);
-    front_flipper_wheel_pub_.publish(flipper_f);
+    //back_flipper_wheel_pub_.publish(flipper_b);
+    //front_flipper_wheel_pub_.publish(flipper_f);
     
     twist_pub_.publish(cmd_twist_);
     right_wheel_pub_.publish(traction_r);
@@ -155,9 +183,17 @@ void PadPluginRising::execute(const std::vector<Button>& buttons, std::vector<fl
   pad_status_pub_.publish(movement_status_msg_);
 }
 void PadPluginRising::jointStatesCallback(const sensor_msgs::JointState::ConstPtr& msg) {    
+    std::string joint = "robot_back_flipper_joint";
+    if (msg->name[0] == joint){
     flipper_b_read.data = -msg->position[0];
     //ROS_INFO("Variable b_read en subs: %f", flipper_b_read.data);
+    //ROS_INFO("Variable f_read en subs: %f", flipper_f_read.data);
     flipper_f_read.data = msg->position[1];
+    //msg_test = *msg;
+    //test_pub_ .publish(msg_test);
+    }
+
+    //sleep(200);
  }
 }  // namespace pad_plugins
 

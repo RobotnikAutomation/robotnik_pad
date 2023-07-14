@@ -23,15 +23,16 @@ public:
   virtual void jointStatesCallback(const sensor_msgs::JointState::ConstPtr& msg);
 
 protected:
-  int button_dead_man_, axis_linear_x_, axis_linear_y_, axis_angular_z_;
+  int button_dead_man_, axis_linear_x_, axis_linear_y_, axis_angular_z_, axis_frontflipper_, axis_backflipper_;
   int button_speed_up_, button_speed_down_, button_kinematic_mode_;
   double max_speed_;
   double max_steering_angle_;
   std::string cmd_topic_vel_;
   std_msgs::Float64 flipper_b_read;
   std_msgs::Float64 flipper_f_read;
-double max_linear_speed_, max_angular_speed_;
-  ros::Publisher ackermann_pub_, pad_status_pub_, right_wheel_pub_, left_wheel_pub_, front_flipper_wheel_pub_, back_flipper_wheel_pub_, twist_pub_;
+  sensor_msgs::JointState msg_test;
+  double max_linear_speed_, max_angular_speed_;
+  ros::Publisher ackermann_pub_, pad_status_pub_, right_wheel_pub_, left_wheel_pub_, front_flipper_wheel_pub_, back_flipper_wheel_pub_, twist_pub_, test_pub_;
   ros::Subscriber joint_states_sub_;
   robotnik_pad_msgs::MovementStatus movement_status_msg_;
   //! current velocity level used to compute the target velocity
