@@ -75,7 +75,7 @@ namespace pad_plugins
 
     }
 
-    void PadPluginPtz::updateArrows(std::vector<float> &axes){
+    void PadPluginPtz::updateArrows(const std::vector<Axes> &axes){
 
         /*
         * Arrow buttons are considered axes by the joy node. 
@@ -83,12 +83,12 @@ namespace pad_plugins
         * the methods of the Button class
         */
 
-        if (axes[button_vertical_arrow_] > 0){
+        if (axes[button_vertical_arrow_].getValue() > 0){
             up_arrow.press(1);
             down_arrow.press(0);
 
         }
-        else if (axes[button_vertical_arrow_] < 0){
+        else if (axes[button_vertical_arrow_].getValue() < 0){
             up_arrow.press(0);
             down_arrow.press(1);
 
@@ -99,11 +99,11 @@ namespace pad_plugins
         }
 
 
-        if (axes[button_horizontal_arrow_] > 0){
+        if (axes[button_horizontal_arrow_].getValue() > 0){
             right_arrow.press(1);
             left_arrow.press(0);
         }
-        else if (axes[button_horizontal_arrow_] < 0){
+        else if (axes[button_horizontal_arrow_].getValue() < 0){
             right_arrow.press(0);
             left_arrow.press(1);
         }
@@ -344,7 +344,7 @@ namespace pad_plugins
     }
 
 
-    void PadPluginPtz::execute(const std::vector<Button> &buttons, std::vector<float> &axes){
+    void PadPluginPtz::execute(const std::vector<Button> &buttons, const std::vector<Axes> &axes){
 
         // Revisar zoom en posicion y velocidad
         // Revisar timeout en zoom

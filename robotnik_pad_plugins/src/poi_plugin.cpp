@@ -33,7 +33,7 @@ namespace pad_plugins{
     }
 
 
-    void PadPluginPoi::execute(const std::vector<Button>& buttons, std::vector<float>& axes)
+    void PadPluginPoi::execute(const std::vector<Button>& buttons, const std::vector<Axes>& axes)
     {
 
         if (buttons[button_dead_man_].isPressed())

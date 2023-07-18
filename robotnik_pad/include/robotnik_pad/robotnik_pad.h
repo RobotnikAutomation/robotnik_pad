@@ -14,6 +14,7 @@
 
 #include <rcomponent/rcomponent.h>
 #include <robotnik_pad/button.h>
+#include <robotnik_pad/axes.h>
 
 class RobotnikPad : public rcomponent::RComponent
 {
@@ -65,7 +66,7 @@ protected:
   double joy_timeout_;
 
   //! Vector to save the axis values
-  std::vector<float> axes_;
+  std::vector<Axes> axes_;
   //! Vector to save and control the axis values
   std::vector<Button> buttons_;
 

@@ -24,9 +24,9 @@ public:
   ~PadPluginPtz();
 
   virtual void initialize(const ros::NodeHandle &nh, const std::string &plugin_ns);
-  virtual void execute(const std::vector<Button> &buttons, std::vector<float> &axes);
+  virtual void execute(const std::vector<Button> &buttons, const std::vector<Axes> &axes);
 
-  void updateArrows(std::vector<float> &axes);
+  void updateArrows(const std::vector<Axes> &axes);
   void resetReleasedArrows();
   robotnik_msgs::ptz positionControl(const std::vector<Button> &buttons);
   robotnik_msgs::ptz speedControl(const std::vector<Button> &buttons);

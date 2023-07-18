@@ -70,7 +70,8 @@ void RobotnikPad::initState()
 
   for (int i = 0; i < num_of_axes_; i++)
   {
-    axes_.push_back(0.0);
+		Axes a;
+    axes_.push_back(a);
   }
 
   pad_plugins_loader_ = new pluginlib::ClassLoader<pad_plugins::GenericPadPlugin>("robotnik_pad",
@@ -128,6 +129,11 @@ void RobotnikPad::readyState()
   {
     button.resetReleased();
   }
+
+	for (auto& axes : axes_)
+  {
+    axes.resetReleased();
+  }
 }
 
 void RobotnikPad::emergencyState()
@@ -147,7 +153,8 @@ void RobotnikPad::joyCb(const sensor_msgs::Joy::ConstPtr& joy)
   // Fill in the axes and buttons arrays
   for (int i = 0; i < joy->axes.size(); i++)
   {
-    axes_[i] = joy->axes[i];
+    //axes_[i] = joy->axes[i];
+		axes_[i].press(joy->axes[i]);
   }
   for (int i = 0; i < joy->buttons.size(); i++)
   {

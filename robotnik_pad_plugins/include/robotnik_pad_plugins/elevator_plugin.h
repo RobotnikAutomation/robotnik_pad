@@ -13,11 +13,12 @@ public:
   ~PadPluginElevator();
 
   virtual void initialize(const ros::NodeHandle &nh, const std::string &plugin_ns);
-  virtual void execute(const std::vector<Button> &buttons, std::vector<float> &axes);
+  virtual void execute(const std::vector<Button> &buttons, const std::vector<Axes> &axes);
 
 protected:
   int button_dead_man_;
-  double axis_elevator_;
+  int axis_elevator_up_;
+	int axis_elevator_down_;
 
   std::string elevator_service_name_;
   ros::ServiceClient set_elevator_client_;
