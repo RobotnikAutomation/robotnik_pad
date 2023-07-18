@@ -107,11 +107,11 @@ void PadPluginRising::execute(const std::vector<Button>& buttons, std::vector<fl
 
       if(axes[axis_backflipper_] != 0.0){
         flipper_b.data = flipper_b_read.data - axes[axis_backflipper_]*0.5;
-        back_flipper_wheel_pub_.publish(flipper_b);
+        //back_flipper_wheel_pub_.publish(flipper_b);
       }
       if(axes[axis_frontflipper_] != 0.0){
         flipper_f.data = flipper_f_read.data + axes[axis_frontflipper_]*0.5;
-        front_flipper_wheel_pub_.publish(flipper_f);
+        //front_flipper_wheel_pub_.publish(flipper_f);
       } 
       
     }else{
@@ -138,6 +138,9 @@ void PadPluginRising::execute(const std::vector<Button>& buttons, std::vector<fl
 
     // Allow rising to traction while moving flippers
     twist_pub_.publish(cmd_twist_);
+    back_flipper_wheel_pub_.publish(flipper_b);
+    front_flipper_wheel_pub_.publish(flipper_f);
+
   }
   else if (buttons[button_dead_man_].isReleased() )
   {
@@ -147,8 +150,8 @@ void PadPluginRising::execute(const std::vector<Button>& buttons, std::vector<fl
 
     // AÑADIR PUBLICAR EN LA POSICIÓN ACTUAL?
 
-    //back_flipper_wheel_pub_.publish(flipper_b_read);
-    //front_flipper_wheel_pub_.publish(flipper_f_read);
+    back_flipper_wheel_pub_.publish(flipper_b_read);
+    front_flipper_wheel_pub_.publish(flipper_f_read);
     
     twist_pub_.publish(cmd_twist_);
     
