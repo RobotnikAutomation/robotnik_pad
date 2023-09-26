@@ -4,6 +4,9 @@ namespace pad_plugins
 {
     PadPluginPtz::PadPluginPtz(){
 
+        inverted_tilt_axis_ = false;
+        inverted_pan_axis_ = false;
+
     }
 
     PadPluginPtz::~PadPluginPtz(){
@@ -20,6 +23,9 @@ namespace pad_plugins
         readParam(pnh_, "config/button_home", button_home_, button_home_, required);
         readParam(pnh_, "config/button_pan", button_vertical_arrow_, button_vertical_arrow_, required);
         readParam(pnh_, "config/button_tilt", button_horizontal_arrow_, button_horizontal_arrow_, required);
+        readParam(pnh_, "config/inverted_tilt_axis", inverted_tilt_axis_, inverted_tilt_axis_, false);
+        readParam(pnh_, "config/inverted_pan_axis", inverted_pan_axis_, inverted_pan_axis_, false);
+        
         readParam(pnh_, "config/button_zoom_in", button_zoom_in_, button_zoom_in_, required);
         readParam(pnh_, "config/button_zoom_out", button_zoom_out_, button_zoom_out_, required);
         readParam(pnh_, "config/button_increment_up", button_step_up_, button_step_up_, required);
@@ -83,12 +89,12 @@ namespace pad_plugins
         * the methods of the Button class
         */
 
-        if (axes[button_vertical_arrow_] > 0){
+        if (axes[button_vertical_arrow_] * (inverted_tilt_axis_?-1:1)  > 0){
             up_arrow.press(1);
             down_arrow.press(0);
 
         }
-        else if (axes[button_vertical_arrow_] < 0){
+        else if (axes[button_vertical_arrow_] * (inverted_tilt_axis_?-1:1) < 0){
             up_arrow.press(0);
             down_arrow.press(1);
 
@@ -99,11 +105,11 @@ namespace pad_plugins
         }
 
 
-        if (axes[button_horizontal_arrow_] > 0){
+        if (axes[button_horizontal_arrow_] * (inverted_pan_axis_?-1:1) > 0){
             right_arrow.press(1);
             left_arrow.press(0);
         }
-        else if (axes[button_horizontal_arrow_] < 0){
+        else if (axes[button_horizontal_arrow_] * (inverted_pan_axis_?-1:1) < 0){
             right_arrow.press(0);
             left_arrow.press(1);
         }
@@ -175,11 +181,11 @@ namespace pad_plugins
                 }
 
                 if (right_arrow.isPressed()){
-                    pan_position_ = pan_position_ - current_position_increment_; 
+                    pan_position_ = pan_position_ + current_position_increment_; 
                 }
 
                 if (left_arrow.isPressed()){
-                    pan_position_ = pan_position_ + current_position_increment_;    
+                    pan_position_ = pan_position_ - current_position_increment_;    
                 }
 
                 tilt_position_ = std::max(std::min(tilt_position_, max_tilt_position_), min_tilt_position_);
@@ -241,11 +247,11 @@ namespace pad_plugins
         }
 
         if (right_arrow.isPressed()){
-            pan_speed_ = - current_speed_;   
+            pan_speed_ = current_speed_;   
         }
 
         if (left_arrow.isPressed()){
-            pan_speed_ = current_speed_;
+            pan_speed_ = - current_speed_;
         }
 
 
