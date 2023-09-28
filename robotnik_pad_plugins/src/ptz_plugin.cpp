@@ -4,6 +4,11 @@ namespace pad_plugins
 {
     PadPluginPtz::PadPluginPtz(){
 
+        inverted_tilt_ptz_ = false;
+        inverted_pan_ptz_ = false;
+        tilt_ptz_spin_ = 1;
+        pan_ptz_spin_ = 1;
+
     }
 
     PadPluginPtz::~PadPluginPtz(){
@@ -20,6 +25,9 @@ namespace pad_plugins
         readParam(pnh_, "config/button_home", button_home_, button_home_, required);
         readParam(pnh_, "config/button_pan", button_vertical_arrow_, button_vertical_arrow_, required);
         readParam(pnh_, "config/button_tilt", button_horizontal_arrow_, button_horizontal_arrow_, required);
+        readParam(pnh_, "config/inverted_tilt_ptz", inverted_tilt_ptz_, inverted_tilt_ptz_, false);
+        readParam(pnh_, "config/inverted_pan_ptz", inverted_pan_ptz_, inverted_pan_ptz_, false);
+        
         readParam(pnh_, "config/button_zoom_in", button_zoom_in_, button_zoom_in_, required);
         readParam(pnh_, "config/button_zoom_out", button_zoom_out_, button_zoom_out_, required);
         readParam(pnh_, "config/button_increment_up", button_step_up_, button_step_up_, required);
@@ -67,6 +75,18 @@ namespace pad_plugins
             ptz_mode_ = PtzModes::Speed;
         }
 
+
+        if (inverted_tilt_ptz_ == true) {
+            tilt_ptz_spin_ = -1;
+        } else {
+            tilt_ptz_spin_ = 1;
+        }
+        if (inverted_pan_ptz_ == true) {
+            pan_ptz_spin_ = -1;
+        } else {
+            pan_ptz_spin_ = 1;
+        }
+
         zoom_level_ = 50;
 
         timeout = 0;
@@ -83,12 +103,12 @@ namespace pad_plugins
         * the methods of the Button class
         */
 
-        if (axes[button_vertical_arrow_] > 0){
+        if (axes[button_vertical_arrow_] * tilt_ptz_spin_  > 0){
             up_arrow.press(1);
             down_arrow.press(0);
 
         }
-        else if (axes[button_vertical_arrow_] < 0){
+        else if (axes[button_vertical_arrow_] * tilt_ptz_spin_ < 0){
             up_arrow.press(0);
             down_arrow.press(1);
 
@@ -99,11 +119,11 @@ namespace pad_plugins
         }
 
 
-        if (axes[button_horizontal_arrow_] > 0){
+        if (axes[button_horizontal_arrow_] * pan_ptz_spin_ > 0){
             right_arrow.press(1);
             left_arrow.press(0);
         }
-        else if (axes[button_horizontal_arrow_] < 0){
+        else if (axes[button_horizontal_arrow_] * pan_ptz_spin_ < 0){
             right_arrow.press(0);
             left_arrow.press(1);
         }
@@ -175,11 +195,11 @@ namespace pad_plugins
                 }
 
                 if (right_arrow.isPressed()){
-                    pan_position_ = pan_position_ - current_position_increment_; 
+                    pan_position_ = pan_position_ + current_position_increment_; 
                 }
 
                 if (left_arrow.isPressed()){
-                    pan_position_ = pan_position_ + current_position_increment_;    
+                    pan_position_ = pan_position_ - current_position_increment_;    
                 }
 
                 tilt_position_ = std::max(std::min(tilt_position_, max_tilt_position_), min_tilt_position_);
@@ -241,11 +261,11 @@ namespace pad_plugins
         }
 
         if (right_arrow.isPressed()){
-            pan_speed_ = - current_speed_;   
+            pan_speed_ = current_speed_;   
         }
 
         if (left_arrow.isPressed()){
-            pan_speed_ = current_speed_;
+            pan_speed_ = - current_speed_;
         }
 
 
