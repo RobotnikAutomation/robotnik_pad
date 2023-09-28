@@ -45,7 +45,8 @@ protected:
   int button_ptz_mode_;
 
   Button up_arrow, down_arrow, left_arrow, right_arrow;
-  bool inverted_pan_axis_, inverted_tilt_axis_;
+  bool inverted_pan_ptz_, inverted_tilt_ptz_;
+  int pan_ptz_spin_, tilt_ptz_spin_;
 
   double tilt_position_, pan_position_, zoom_position_;
   double current_position_increment_;
