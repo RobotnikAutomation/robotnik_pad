@@ -39,7 +39,9 @@ void PadPluginRising::initialize(const ros::NodeHandle& nh, const std::string& p
   readParam(pnh_, "config/button_speed_up", button_speed_up_, button_speed_up_, required);
   button_speed_down_ = 1;
   readParam(pnh_, "config/button_speed_down", button_speed_down_, button_speed_down_, required);
-  axis_vertical_arrow_ = 11;
+  axis_horizontal_arrow_ = 9;
+  readParam(pnh_, "config/axis_record_water_data", axis_horizontal_arrow_, axis_horizontal_arrow_, required);
+  axis_vertical_arrow_ = 10;
   readParam(pnh_, "config/axis_tube_extensor", axis_vertical_arrow_, axis_vertical_arrow_, required);
   max_speed_ = 1.5;
   readParam(pnh_, "max_speed", max_speed_, max_speed_, required);
@@ -59,10 +61,13 @@ void PadPluginRising::initialize(const ros::NodeHandle& nh, const std::string& p
   readParam(pnh_, "tube_rollup_pin", tube_rollup_pin_, tube_rollup_pin_);
   tube_unroll_pin_ = 0;
   readParam(pnh_, "tube_unroll_pin", tube_unroll_pin_, tube_unroll_pin_);
+  water_record_ = "odysseus_gcs/start_stop";
+  readParam(pnh_, "water_record_", water_record_, water_record_, required);
 
   // Publishers
   twist_pub_ = nh_.advertise<geometry_msgs::Twist>(cmd_topic_vel_, 10);
   pad_status_pub_ = pnh_.advertise<robotnik_pad_msgs::MovementStatus>("status", 10);
+  water_record_pub_ = nh_.advertise<std_msgs::Bool>(water_record_, 10);
   	
   // RISING COMMANDS
 	right_wheel_pub_ = nh_.advertise<std_msgs::Float64>("front_right_master_wheel_joint_controller/command", 1);
@@ -148,6 +153,8 @@ void PadPluginRising::execute(const std::vector<Button>& buttons, std::vector<fl
       cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_];
       cmd_twist_.angular.z = current_velocity_level_ * max_angular_speed_ * (axes[axis_angular_z_]*2);
 
+    // Tube extension system 
+
       if (axes[axis_vertical_arrow_] > 0){
          
         ROS_WARN("arrow up!!!");
@@ -175,6 +182,28 @@ void PadPluginRising::execute(const std::vector<Button>& buttons, std::vector<fl
           digitalWrite(tube_unroll_pin_, false);
           tube_extensor_working = false;
         }
+
+      }
+
+    // Water record
+
+      if (axes[axis_horizontal_arrow_] > 0){
+         
+        ROS_WARN("Start record!!");
+
+        std_msgs::Bool record_msg;
+        record_msg.data = true; 
+        water_record_pub_.publish(record_msg);
+
+      }
+
+      if (axes[axis_horizontal_arrow_] < 0){
+         
+        ROS_WARN("Stop record!!");
+
+        std_msgs::Bool record_msg;
+        record_msg.data = false; 
+        water_record_pub_.publish(record_msg);
 
       }
 
