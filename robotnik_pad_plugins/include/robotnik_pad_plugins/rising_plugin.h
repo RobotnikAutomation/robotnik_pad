@@ -7,6 +7,9 @@
 #include <robotnik_pad_msgs/MovementStatus.h>
 #include <sensor_msgs/JointState.h>
 #include <std_msgs/Float64.h>
+#include <robotnik_msgs/inputs_outputs.h>
+#include <robotnik_msgs/set_digital_output.h>
+
 std_msgs::Float64 flipper_b_read;
 std_msgs::Float64 flipper_f_read;
 namespace pad_plugins
@@ -21,9 +24,10 @@ public:
   virtual void initialize(const ros::NodeHandle& nh, const std::string& plugin_ns);
   virtual void execute(const std::vector<Button>& buttons, std::vector<float>& axes);
   virtual void jointStatesCallback(const sensor_msgs::JointState::ConstPtr& msg);
+  void digitalWrite(int pin, bool state);
 
 protected:
-  int button_dead_man_, axis_linear_x_, axis_linear_y_, axis_angular_z_, axis_frontflipper_, axis_backflipper_;
+  int button_dead_man_, axis_linear_x_, axis_linear_y_, axis_angular_z_, axis_frontflipper_, axis_backflipper_, axis_vertical_arrow_;
   int button_speed_up_, button_speed_down_, button_kinematic_mode_;
   double max_speed_;
   double max_steering_angle_;
@@ -46,8 +50,12 @@ protected:
 geometry_msgs::Twist cmd_twist_;
   ackermann_msgs::AckermannDrive cmd_ackermann_;
 double wheel_base_;
+ros::ServiceClient tube_extensor_srv_;
+  double tube_enable_pin_,tube_rollup_pin_,tube_unroll_pin_;
+  bool tube_extensor_working;
 
 };
 }
 void jointStatesCallback(const sensor_msgs::JointState::ConstPtr& msg);  // namespace pad_plugins
+
 #endif  // PAD_PLUGIN_RISING_H_

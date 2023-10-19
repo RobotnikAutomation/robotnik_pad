@@ -9,6 +9,10 @@ PadPluginRising::PadPluginRising()
 
 PadPluginRising::~PadPluginRising()
 {
+  // Stop tube extensor when pad dies
+  digitalWrite(tube_enable_pin_, false);
+  digitalWrite(tube_rollup_pin_, false);
+  digitalWrite(tube_unroll_pin_, false);
 }
 
 void PadPluginRising::initialize(const ros::NodeHandle& nh, const std::string& plugin_ns)
@@ -35,6 +39,8 @@ void PadPluginRising::initialize(const ros::NodeHandle& nh, const std::string& p
   readParam(pnh_, "config/button_speed_up", button_speed_up_, button_speed_up_, required);
   button_speed_down_ = 1;
   readParam(pnh_, "config/button_speed_down", button_speed_down_, button_speed_down_, required);
+  axis_vertical_arrow_ = 11;
+  readParam(pnh_, "config/axis_tube_extensor", axis_vertical_arrow_, axis_vertical_arrow_, required);
   max_speed_ = 1.5;
   readParam(pnh_, "max_speed", max_speed_, max_speed_, required);
   max_linear_speed_ = 1.5;
@@ -47,7 +53,12 @@ void PadPluginRising::initialize(const ros::NodeHandle& nh, const std::string& p
   readParam(pnh_, "cmd_topic_vel", cmd_topic_vel_, cmd_topic_vel_, required);
   wheel_base_ = 0;
   readParam(pnh_, "wheel_base", wheel_base_, wheel_base_);
-
+  tube_enable_pin_ = 0;
+  readParam(pnh_, "tube_enable_pin", tube_enable_pin_, tube_enable_pin_);
+  tube_rollup_pin_ = 0;
+  readParam(pnh_, "tube_rollup_pin", tube_rollup_pin_, tube_rollup_pin_);
+  tube_unroll_pin_ = 0;
+  readParam(pnh_, "tube_unroll_pin", tube_unroll_pin_, tube_unroll_pin_);
 
   // Publishers
   twist_pub_ = nh_.advertise<geometry_msgs::Twist>(cmd_topic_vel_, 10);
@@ -58,6 +69,7 @@ void PadPluginRising::initialize(const ros::NodeHandle& nh, const std::string& p
 	left_wheel_pub_ = nh_.advertise<std_msgs::Float64>("front_left_master_wheel_joint_controller/command", 1);
   front_flipper_wheel_pub_ = nh_.advertise<std_msgs::Float64>("front_flipper_joint_controller/command", 1);
 	back_flipper_wheel_pub_ = nh_.advertise<std_msgs::Float64>("back_flipper_joint_controller/command", 1);
+  tube_extensor_srv_ = nh_.serviceClient<robotnik_msgs::set_digital_output>("robotnik_base_hw/set_digital_output");
 
   // SUBSCRIBER JOINT STATES
   joint_states_sub_ = nh_.subscribe("joint_states", 1, &PadPluginRising::jointStatesCallback, this);
@@ -71,6 +83,7 @@ void PadPluginRising::initialize(const ros::NodeHandle& nh, const std::string& p
   flipper_f_read.data = 0.0;
   cmd_twist_ = geometry_msgs::Twist();
   movement_status_msg_ = robotnik_pad_msgs::MovementStatus();
+  tube_extensor_working = false;
 }
 
 
@@ -134,6 +147,37 @@ void PadPluginRising::execute(const std::vector<Button>& buttons, std::vector<fl
     // ----------------------------------------------
       cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_];
       cmd_twist_.angular.z = current_velocity_level_ * max_angular_speed_ * (axes[axis_angular_z_]*2);
+
+      if (axes[axis_vertical_arrow_] > 0){
+         
+        ROS_WARN("arrow up!!!");
+
+        digitalWrite(tube_enable_pin_, true);
+        digitalWrite(tube_rollup_pin_, true);
+        tube_extensor_working = true;
+
+      }
+
+      else if (axes[axis_vertical_arrow_] < 0){
+         
+        ROS_WARN("arrow down!!!");
+        digitalWrite(tube_enable_pin_, true);
+        digitalWrite(tube_unroll_pin_, true);
+        tube_extensor_working = true;
+
+      }
+
+      else{
+
+        if (tube_extensor_working == true){
+          digitalWrite(tube_enable_pin_, false);
+          digitalWrite(tube_rollup_pin_, false);
+          digitalWrite(tube_unroll_pin_, false);
+          tube_extensor_working = false;
+        }
+
+      }
+
     }
 
     // Allow rising to traction while moving flippers
@@ -170,5 +214,17 @@ void PadPluginRising::jointStatesCallback(const sensor_msgs::JointState::ConstPt
       flipper_f_read.data =  msg->position[1];
     }
 }
+
+
+void PadPluginRising::digitalWrite(int pin, bool state){
+  
+      robotnik_msgs::set_digital_output srv;
+
+      srv.request.output = pin;
+      srv.request.value = state;
+      tube_extensor_srv_.call(srv);
+
+}
+
 }  // namespace pad_plugins
 
