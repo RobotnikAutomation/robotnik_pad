@@ -62,7 +62,18 @@ void PadPluginRising::initialize(const ros::NodeHandle& nh, const std::string& p
   tube_unroll_pin_ = 0;
   readParam(pnh_, "tube_unroll_pin", tube_unroll_pin_, tube_unroll_pin_);
   water_record_ = "odysseus_gcs/start_stop";
-  readParam(pnh_, "water_record_", water_record_, water_record_, required);
+  readParam(pnh_, "water_record", water_record_, water_record_, required);
+
+  enable_web_buttons_ = false;
+  readParam(pnh_, "config/enable_web_buttons", enable_web_buttons_, enable_web_buttons_, required);
+  button_tube_rollup_ = 9;
+  readParam(pnh_, "config/button_tube_rollup", button_tube_rollup_, button_tube_rollup_, required);
+  button_tube_unroll_ = 10;
+  readParam(pnh_, "config/button_tube_unroll", button_tube_unroll_, button_tube_unroll_, required);
+  button_start_record_water_data_ = 9;
+  readParam(pnh_, "config/button_start_record_water_data", button_start_record_water_data_, button_start_record_water_data_, required);
+  button_stop_record_water_data_ = 10;
+  readParam(pnh_, "config/button_stop_record_water_data", button_stop_record_water_data_, button_stop_record_water_data_, required);
 
   // Publishers
   twist_pub_ = nh_.advertise<geometry_msgs::Twist>(cmd_topic_vel_, 10);
@@ -80,7 +91,7 @@ void PadPluginRising::initialize(const ros::NodeHandle& nh, const std::string& p
   joint_states_sub_ = nh_.subscribe("joint_states", 1, &PadPluginRising::jointStatesCallback, this);
 
   // Initialize variables
-  current_velocity_level_ = 0.1;
+  current_velocity_level_ = 0.2; // 0.1
   velocity_level_step_ = 0.1;
   max_velocity_level_ = 1.0;
   min_velocity_level_ = 0.1;
@@ -150,64 +161,152 @@ void PadPluginRising::execute(const std::vector<Button>& buttons, std::vector<fl
     //           Y SE HA CAMBIADO POR ESTO
     // ----------------------------------------------
     // ----------------------------------------------
+      if (abs(axes[axis_linear_x_]) > 0.05){
       cmd_twist_.linear.x = current_velocity_level_ * max_linear_speed_ * axes[axis_linear_x_];
-      cmd_twist_.angular.z = current_velocity_level_ * max_angular_speed_ * (axes[axis_angular_z_]*2);
-
-    // Tube extension system 
-
-      if (axes[axis_vertical_arrow_] > 0){
-         
-        ROS_WARN("arrow up!!!");
-
-        digitalWrite(tube_enable_pin_, true);
-        digitalWrite(tube_rollup_pin_, true);
-        tube_extensor_working = true;
-
       }
-
-      else if (axes[axis_vertical_arrow_] < 0){
-         
-        ROS_WARN("arrow down!!!");
-        digitalWrite(tube_enable_pin_, true);
-        digitalWrite(tube_unroll_pin_, true);
-        tube_extensor_working = true;
-
-      }
-
       else{
+        cmd_twist_.linear.x = 0.0;
+      }
 
-        if (tube_extensor_working == true){
-          digitalWrite(tube_enable_pin_, false);
-          digitalWrite(tube_rollup_pin_, false);
-          digitalWrite(tube_unroll_pin_, false);
-          tube_extensor_working = false;
+      if (abs(axes[axis_angular_z_]) > 0.05){
+      cmd_twist_.angular.z = current_velocity_level_ * max_angular_speed_ * (axes[axis_angular_z_]*2);
+      }
+      else{
+        cmd_twist_.angular.z = 0.0;
+      }
+
+    // ================================================================= //
+    // ================ WATER SYSTEM WITH NORMAL PAD =================== //
+    // ================================================================= //
+
+    if (enable_web_buttons_ == false){
+
+      // Tube extension system 
+       ROS_WARN_THROTTLE(3, "normal pad");
+
+        if (axes[axis_vertical_arrow_] > 0){
+          
+          ROS_WARN("arrow up!!!");
+
+          digitalWrite(tube_enable_pin_, true);
+          digitalWrite(tube_rollup_pin_, true);
+          tube_extensor_working = true;
+
+        }
+
+        else if (axes[axis_vertical_arrow_] < 0){
+          
+          ROS_WARN("arrow down!!!");
+          digitalWrite(tube_enable_pin_, true);
+          digitalWrite(tube_unroll_pin_, true);
+          tube_extensor_working = true;
+
+        }
+
+        else{
+
+          if (tube_extensor_working == true){
+            digitalWrite(tube_enable_pin_, false);
+            digitalWrite(tube_rollup_pin_, false);
+            digitalWrite(tube_unroll_pin_, false);
+            tube_extensor_working = false;
+          }
+
+        }
+
+      // Water record
+
+        if (axes[axis_horizontal_arrow_] > 0){
+          
+          ROS_WARN("Start record!!");
+
+          std_msgs::Bool record_msg;
+          record_msg.data = true; 
+          water_record_pub_.publish(record_msg);
+
+        }
+
+        if (axes[axis_horizontal_arrow_] < 0){
+          
+          ROS_WARN("Stop record!!");
+
+          std_msgs::Bool record_msg;
+          record_msg.data = false; 
+          water_record_pub_.publish(record_msg);
+
         }
 
       }
 
-    // Water record
+    // ================================================================= //
+    // ================ WATER SYSTEM WITH WEB PAD =================== //
+    // ================================================================= //
 
-      if (axes[axis_horizontal_arrow_] > 0){
-         
-        ROS_WARN("Start record!!");
 
-        std_msgs::Bool record_msg;
-        record_msg.data = true; 
-        water_record_pub_.publish(record_msg);
+    if (enable_web_buttons_ == true){
+
+      // Tube extension system 
+      ROS_WARN_THROTTLE(3, "web pad");
+
+        if (buttons[button_tube_rollup_].isPressed()){
+          
+          ROS_WARN("arrow up!!!");
+
+          digitalWrite(tube_enable_pin_, true);
+          digitalWrite(tube_rollup_pin_, true);
+          tube_extensor_working = true;
+
+        }
+
+        else if (buttons[button_tube_unroll_].isPressed()){
+          
+          ROS_WARN("arrow down!!!");
+          digitalWrite(tube_enable_pin_, true);
+          digitalWrite(tube_unroll_pin_, true);
+          tube_extensor_working = true;
+
+        }
+
+        else{
+
+          if (tube_extensor_working == true){
+            digitalWrite(tube_enable_pin_, false);
+            digitalWrite(tube_rollup_pin_, false);
+            digitalWrite(tube_unroll_pin_, false);
+            tube_extensor_working = false;
+          }
+
+        }
+
+      // Water record
+
+        if (buttons[button_start_record_water_data_].isPressed()){
+          
+          ROS_WARN("Start record!!");
+
+          std_msgs::Bool record_msg;
+          record_msg.data = true; 
+          water_record_pub_.publish(record_msg);
+
+        }
+
+        if (buttons[button_stop_record_water_data_].isPressed()){
+          
+          ROS_WARN("Stop record!!");
+
+          std_msgs::Bool record_msg;
+          record_msg.data = false; 
+          water_record_pub_.publish(record_msg);
+
+        }
 
       }
 
-      if (axes[axis_horizontal_arrow_] < 0){
-         
-        ROS_WARN("Stop record!!");
 
-        std_msgs::Bool record_msg;
-        record_msg.data = false; 
-        water_record_pub_.publish(record_msg);
 
-      }
 
     }
+
 
     // Allow rising to traction while moving flippers
     twist_pub_.publish(cmd_twist_);
@@ -227,6 +326,13 @@ void PadPluginRising::execute(const std::vector<Button>& buttons, std::vector<fl
     front_flipper_wheel_pub_.publish(flipper_f_read);
     
     twist_pub_.publish(cmd_twist_);
+
+    if (tube_extensor_working == true){
+      digitalWrite(tube_enable_pin_, false);
+      digitalWrite(tube_rollup_pin_, false);
+      digitalWrite(tube_unroll_pin_, false);
+      tube_extensor_working = false;
+    }
     
   }
 

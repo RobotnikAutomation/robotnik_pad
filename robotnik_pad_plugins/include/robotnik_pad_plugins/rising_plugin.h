@@ -30,6 +30,8 @@ public:
 protected:
   int button_dead_man_, axis_linear_x_, axis_linear_y_, axis_angular_z_, axis_frontflipper_, axis_backflipper_, axis_vertical_arrow_, axis_horizontal_arrow_;
   int button_speed_up_, button_speed_down_, button_kinematic_mode_;
+  bool enable_web_buttons_;
+  int button_tube_rollup_,button_tube_unroll_,button_start_record_water_data_,button_stop_record_water_data_;
   double max_speed_;
   double max_steering_angle_;
   std::string cmd_topic_vel_;
