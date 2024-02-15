@@ -3,6 +3,8 @@ plugins:
 #  - Elevator
 #  - Poi
 #  - Ptz
+#  - BlkArc
+#  - SafetyMovement
 
 pad:
   type: ps4
@@ -29,12 +31,41 @@ Movement:
     axis_watchdog: 8
     watchdog_duration: 0.5
 
+SafetyMovement:
+  type: robotnik_pad_plugins/SafetyMovement
+  max_linear_speed: 1.5
+  max_angular_speed: 3
+  max_linear_speed_unsafe: 0.8
+  max_angular_speed_unsafe: 1
+  cmd_topic_vel: pad_teleop/cmd_vel
+  cmd_topic_vel_unsafe: pad_teleop/cmd_vel_unsafe
+  config:
+    button_deadman: 5
+    button_disable_safety: 4
+    axis_linear_x: 1
+    axis_linear_y: 0
+    axis_angular_z: 2
+    button_speed_up: 3
+    button_speed_down: 1
+    button_kinematic_mode: 7
+    use_accel_watchdog: true
+    axis_watchdog: 8
+    watchdog_duration: 0.5
+
 Elevator:
   type: robotnik_pad_plugins/Elevator
   elevator_service_name: robotnik_base_control/set_elevator
   config:
     deadman: 5
     axis_elevator: 10
+
+BlkArc:
+  type: std_srvs/Trigger
+  blk_arc_start_capture_service_name: /blkarc/start_capture
+  blk_arc_stop_capture_service_name: /blkarc/stop_capture
+  config:
+    deadman: 5
+    blk_arc: 10
 
 Poi:
   type: robotnik_pad_plugins/Poi
@@ -47,14 +78,14 @@ Poi:
 Ptz:
   type: robotnik_pad_plugins/Ptz
   cmd_topic_ptz: ptz/command
-  
+
   speed_increment: 0.5
   speed_limit: 3.14
 
   home_pan_position: 0.0
   home_tilt_position: 0.0
   home_zoom_position: 0.0
-  
+
   position_increment: 0.1
   position_increment_limit: 0.5
   min_pan_position: -3.14
@@ -70,8 +101,8 @@ Ptz:
     button_home: 12
     button_pan:  10
     button_tilt: 9
-    button_zoom_in: 4 
+    button_zoom_in: 4
     button_zoom_out: 6
-    button_increment_up: 2 
+    button_increment_up: 2
     button_increment_down: 0
     #button_ptz_mode: 8
