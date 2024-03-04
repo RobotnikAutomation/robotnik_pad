@@ -18,6 +18,8 @@ public:
 protected:
   int button_dead_man_;
   double axis_elevator_;
+  bool elevator_is_running_;
+  bool stop_elevator_;
 
   std::string elevator_service_name_;
   ros::ServiceClient set_elevator_client_;
