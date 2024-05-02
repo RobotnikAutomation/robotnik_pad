@@ -13,6 +13,8 @@ PadPluginRising::~PadPluginRising()
   digitalWrite(tube_enable_pin_, false);
   digitalWrite(tube_rollup_pin_, false);
   digitalWrite(tube_unroll_pin_, false);
+  digitalWrite(back_tube_unroll_pin_, false);
+  digitalWrite(back_tube_rollup_pin_, false);
 }
 
 void PadPluginRising::initialize(const ros::NodeHandle& nh, const std::string& plugin_ns)
@@ -23,6 +25,10 @@ void PadPluginRising::initialize(const ros::NodeHandle& nh, const std::string& p
   nh_ = ros::NodeHandle();
   button_dead_man_ = 5;
   readParam(pnh_, "config/button_deadman", button_dead_man_, button_dead_man_, required);
+  button_power_on_arm_ = 8;
+  readParam(pnh_, "config/button_power_on_arm", button_power_on_arm_, button_power_on_arm_, required);
+  button_power_off_arm_ = 9;
+  readParam(pnh_, "config/button_power_off_arm", button_power_off_arm_, button_power_off_arm_, required);
   button_kinematic_mode_ = 7;
   readParam(pnh_, "config/button_kinematic_mode", button_kinematic_mode_, button_kinematic_mode_, required);
   axis_frontflipper_ = 1;
@@ -61,6 +67,10 @@ void PadPluginRising::initialize(const ros::NodeHandle& nh, const std::string& p
   readParam(pnh_, "tube_rollup_pin", tube_rollup_pin_, tube_rollup_pin_);
   tube_unroll_pin_ = 0;
   readParam(pnh_, "tube_unroll_pin", tube_unroll_pin_, tube_unroll_pin_);
+  back_tube_unroll_pin_ = 0;
+  readParam(pnh_, "back_tube_unroll_pin", back_tube_unroll_pin_, back_tube_unroll_pin_);
+  back_tube_rollup_pin_ = 0;
+  readParam(pnh_, "back_tube_rollup_pin", back_tube_rollup_pin_, back_tube_rollup_pin_);
   water_record_ = "odysseus_gcs/start_stop";
   readParam(pnh_, "water_record", water_record_, water_record_, required);
 
@@ -79,6 +89,7 @@ void PadPluginRising::initialize(const ros::NodeHandle& nh, const std::string& p
   twist_pub_ = nh_.advertise<geometry_msgs::Twist>(cmd_topic_vel_, 10);
   pad_status_pub_ = pnh_.advertise<robotnik_pad_msgs::MovementStatus>("status", 10);
   water_record_pub_ = nh_.advertise<std_msgs::Bool>(water_record_, 10);
+  toggle_arm_pub_ = nh_.advertise<std_msgs::Bool>("/my_gen3/toggle_kinova", 1);
   	
   // RISING COMMANDS
 	right_wheel_pub_ = nh_.advertise<std_msgs::Float64>("front_right_master_wheel_joint_controller/command", 1);
@@ -114,6 +125,9 @@ void PadPluginRising::execute(const std::vector<Button>& buttons, std::vector<fl
   std_msgs::Float64 flipper_f;
   flipper_b.data = flipper_b_read.data ;
   flipper_f.data = flipper_f_read.data ;
+  time_t now = time(0);
+  tm *ltm = localtime(&now);
+  bool is_even_seconds = (ltm->tm_sec % 3 == 0);
 
   if (buttons[button_dead_man_].isPressed())
   {
@@ -128,6 +142,24 @@ void PadPluginRising::execute(const std::vector<Button>& buttons, std::vector<fl
     {
       current_velocity_level_ = std::min(max_velocity_level_, current_velocity_level_ + velocity_level_step_);
       ROS_INFO("PadPluginRising::execute: speed up -> velocity level = %.1f%%", current_velocity_level_ * 100.0);
+    }
+
+    if (buttons[button_power_on_arm_].isReleased())
+    {
+      ROS_WARN("Power on arm!!");
+
+      std_msgs::Bool arm_msg;
+      arm_msg.data = true; 
+      toggle_arm_pub_.publish(arm_msg);
+    }
+
+    if (buttons[button_power_off_arm_].isReleased())
+    {
+      ROS_WARN("Power off arm!!");
+
+      std_msgs::Bool arm_msg;
+      arm_msg.data = false; 
+      toggle_arm_pub_.publish(arm_msg);
     }
 
     if (buttons[button_kinematic_mode_].isPressed()){
@@ -187,9 +219,17 @@ void PadPluginRising::execute(const std::vector<Button>& buttons, std::vector<fl
         if (axes[axis_vertical_arrow_] > 0){
           
           ROS_WARN("arrow up!!!");
-
-          digitalWrite(tube_enable_pin_, true);
-          digitalWrite(tube_rollup_pin_, true);
+          if(!is_even_seconds)
+          {
+            digitalWrite(tube_enable_pin_, true);
+            digitalWrite(tube_rollup_pin_, true);
+          }else
+          {
+            digitalWrite(tube_enable_pin_, false);
+            digitalWrite(tube_rollup_pin_, false);
+          }
+          digitalWrite(back_tube_unroll_pin_, true);
+          digitalWrite(back_tube_rollup_pin_, true);
           tube_extensor_working = true;
 
         }
@@ -199,6 +239,7 @@ void PadPluginRising::execute(const std::vector<Button>& buttons, std::vector<fl
           ROS_WARN("arrow down!!!");
           digitalWrite(tube_enable_pin_, true);
           digitalWrite(tube_unroll_pin_, true);
+          digitalWrite(back_tube_unroll_pin_, true);
           tube_extensor_working = true;
 
         }
@@ -208,7 +249,10 @@ void PadPluginRising::execute(const std::vector<Button>& buttons, std::vector<fl
           if (tube_extensor_working == true){
             digitalWrite(tube_enable_pin_, false);
             digitalWrite(tube_rollup_pin_, false);
+            digitalWrite(back_tube_unroll_pin_, false);
+            digitalWrite(back_tube_rollup_pin_, false);
             digitalWrite(tube_unroll_pin_, false);
+	    digitalWrite(back_tube_unroll_pin_, false);
             tube_extensor_working = false;
           }
 
@@ -252,8 +296,17 @@ void PadPluginRising::execute(const std::vector<Button>& buttons, std::vector<fl
           
           ROS_WARN("arrow up!!!");
 
-          digitalWrite(tube_enable_pin_, true);
-          digitalWrite(tube_rollup_pin_, true);
+          if(!is_even_seconds)
+          {
+            digitalWrite(tube_enable_pin_, true);
+            digitalWrite(tube_rollup_pin_, true);
+          }else
+          {
+            digitalWrite(tube_enable_pin_, false);
+            digitalWrite(tube_rollup_pin_, false);
+          }
+          digitalWrite(back_tube_unroll_pin_, true);
+          digitalWrite(back_tube_rollup_pin_, true);
           tube_extensor_working = true;
 
         }
@@ -263,6 +316,7 @@ void PadPluginRising::execute(const std::vector<Button>& buttons, std::vector<fl
           ROS_WARN("arrow down!!!");
           digitalWrite(tube_enable_pin_, true);
           digitalWrite(tube_unroll_pin_, true);
+	  digitalWrite(back_tube_unroll_pin_, true);
           tube_extensor_working = true;
 
         }
@@ -273,6 +327,9 @@ void PadPluginRising::execute(const std::vector<Button>& buttons, std::vector<fl
             digitalWrite(tube_enable_pin_, false);
             digitalWrite(tube_rollup_pin_, false);
             digitalWrite(tube_unroll_pin_, false);
+            digitalWrite(back_tube_unroll_pin_, false);
+            digitalWrite(back_tube_rollup_pin_, false);
+            digitalWrite(back_tube_unroll_pin_, false);
             tube_extensor_working = false;
           }
 
@@ -331,6 +388,9 @@ void PadPluginRising::execute(const std::vector<Button>& buttons, std::vector<fl
       digitalWrite(tube_enable_pin_, false);
       digitalWrite(tube_rollup_pin_, false);
       digitalWrite(tube_unroll_pin_, false);
+      digitalWrite(back_tube_unroll_pin_, false);
+      digitalWrite(back_tube_unroll_pin_, false);
+      digitalWrite(back_tube_rollup_pin_, false);
       tube_extensor_working = false;
     }
     

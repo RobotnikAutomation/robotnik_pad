@@ -13,6 +13,11 @@ find_package(catkin REQUIRED COMPONENTS
   robotnik_pad
   robotnik_pad_msgs
   std_msgs
+  robotnik_msgs
+  rising_manipulation_msgs
+  actionlib
+  actionlib_msgs
+  rosmon_msgs
 )
 
 
@@ -56,8 +61,23 @@ target_link_libraries(robotnik_pad_pluginlib
   ${catkin_LIBRARIES}
 )
 
+add_executable(toggle_kinova_node src/trigger_kinova_node.cpp)
+
+add_dependencies(toggle_kinova_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+target_link_libraries(toggle_kinova_node
+  ${catkin_LIBRARIES}
+  ${PROJECT_NAME}
+)
+
 ## Mark executables and/or libraries for installation
 install(TARGETS robotnik_pad_plugins robotnik_pad_pluginlib
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(TARGETS ${PROJECT_NAME} toggle_kinova_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
