@@ -46,6 +46,7 @@ protected:
 
   //! joy callback
   void joyCb(const sensor_msgs::Joy::ConstPtr &joy);
+  void joyAccelCb(const sensor_msgs::Joy::ConstPtr &joy);
   void readPluginsFromParams(const ros::NodeHandle &nh, const std::vector<std::string> &names,
                              std::map<std::string, std::string> &plugins_definitions);
 
@@ -54,16 +55,16 @@ protected:
   /* ROS stuff */
 
   // Subscribers
-  ros::Subscriber joy_sub_;
+  ros::Subscriber joy_sub_, joy_accel_sub_;
 
   // JOYSTICK
   //! Current number of buttons of the joystick
   int num_of_buttons_;
-  int num_of_axes_;
+  int num_of_axes_, accel_num_of_axes_;
   std::string pad_type_;
-  std::string joy_topic_;
+  std::string joy_topic_, joy_topic_accel_;
   double joy_timeout_;
-
+  bool accel_common_dev_interface_;
   //! Vector to save the axis values
   std::vector<float> axes_;
   //! Vector to save and control the axis values

@@ -15,7 +15,14 @@ int RobotnikPad::rosSetup()
   RComponent::rosSetup();
 
   joy_sub_ = nh_.subscribe<sensor_msgs::Joy>(joy_topic_, 1, &RobotnikPad::joyCb, this);
-  addTopicsHealth(&joy_sub_, joy_topic_, joy_timeout_);
+  if (accel_common_dev_interface_)
+    addTopicsHealth(&joy_sub_, joy_topic_, joy_timeout_);
+
+  if (!accel_common_dev_interface_)
+  {
+    joy_accel_sub_ = nh_.subscribe<sensor_msgs::Joy>(joy_topic_accel_, 1, &RobotnikPad::joyAccelCb, this);
+    addTopicsHealth(&joy_accel_sub_, joy_topic_accel_, joy_timeout_);
+  }
 
   return rcomponent::OK;
 }
@@ -47,6 +54,13 @@ void RobotnikPad::rosReadParams()
 
   readParam(pnh_, "plugins", plugins_names, plugins_names);
   readPluginsFromParams(pnh_, plugins_names, plugins_from_params_);
+
+  accel_common_dev_interface_ = true;
+  readParam(pnh_, "pad/accel_common_dev_interface", accel_common_dev_interface_, accel_common_dev_interface_);
+  joy_topic_accel_ = "joy_accel";
+  readParam(pnh_, "pad/joy_topic_accel", joy_topic_accel_, joy_topic_accel_);
+  accel_num_of_axes_ = 6;
+  readParam(pnh_, "pad/accel_num_of_axes", accel_num_of_axes_, accel_num_of_axes_);
 }
 
 int RobotnikPad::setup()
@@ -68,7 +82,10 @@ void RobotnikPad::initState()
     buttons_.push_back(b);
   }
 
-  for (int i = 0; i < num_of_axes_; i++)
+  int total_num_of_axes = num_of_axes_;
+  if (!accel_common_dev_interface_)
+    total_num_of_axes += accel_num_of_axes_;
+  for (int i = 0; i < total_num_of_axes; i++)
   {
     axes_.push_back(0.0);
   }
@@ -154,7 +171,19 @@ void RobotnikPad::joyCb(const sensor_msgs::Joy::ConstPtr& joy)
     buttons_[i].press(joy->buttons[i]);
   }
   // tickTopicsHealth("joy");
-  tickTopicsHealth(joy_topic_);
+  if (accel_common_dev_interface_)
+    tickTopicsHealth(joy_topic_);
+}
+
+void RobotnikPad::joyAccelCb(const sensor_msgs::Joy::ConstPtr& joy)
+{
+  // Fill in the axes and buttons arrays
+  for (int i = num_of_axes_; i < joy->axes.size() + num_of_axes_; i++)
+  {
+    axes_[i] = joy->axes[i - num_of_axes_];
+  }
+  // tickTopicsHealth("joy");
+  tickTopicsHealth(joy_topic_accel_);
 }
 
 void RobotnikPad::readPluginsFromParams(const ros::NodeHandle& nh, const std::vector<std::string>& names,
