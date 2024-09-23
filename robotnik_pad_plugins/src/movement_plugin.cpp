@@ -87,17 +87,17 @@ bool PadPluginMovement::setVelocityLevel(robotnik_msgs::SetFloat64::Request &req
   if(req.data < min_velocity_level_)
   {
     current_velocity_level_ = min_velocity_level_;
-    res.ret.message = "Velocity level out of range. Using min velocity level: " + std::to_string(min_velocity_level_ * 100) + "%";
+    res.ret.message = "Velocity level out of range. Using min velocity level: " + std::to_string(int(min_velocity_level_ * 100)) + "%";
   }
   else if (req.data > max_velocity_level_)
   {
     current_velocity_level_ = max_velocity_level_;
-    res.ret.message = "Velocity level out of range. Using max velocity level: " + std::to_string(max_velocity_level_ * 100) + "%";
+    res.ret.message = "Velocity level out of range. Using max velocity level: " + std::to_string(int(max_velocity_level_ * 100)) + "%";
   }
   else
   {
     current_velocity_level_ = req.data;
-    res.ret.message = "Velocity level set to " + std::to_string(current_velocity_level_ * 100) + "%";
+    res.ret.message = "Velocity level set to " + std::to_string(int(current_velocity_level_ * 100)) + "%";
   }
   res.ret.success = true;
   res.ret.code = 0;
