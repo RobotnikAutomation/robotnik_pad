@@ -52,7 +52,16 @@ void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string&
   // Publishers
   twist_pub_ = nh_.advertise<geometry_msgs::Twist>(cmd_topic_vel_, 10);
   pad_status_pub_ = pnh_.advertise<robotnik_pad_msgs::MovementStatus>("status", 10);
+  pad_current_velocity_level_pub_ = pnh_.advertise<std_msgs::Float64>("velocity_level", 10);
+  
+  //Service server
+  set_velocity_level_srv_ = pnh_.advertiseService("set_velocity_level", &PadPluginMovement::setVelocityLevel, this);
 
+  //Timer to publish current velocity level periodically (1Hz)
+  velocity_publisher_timer_ = nh_.createTimer(ros::Duration(1.0), [this](const ros::TimerEvent& event) {
+    current_velocity_level_msg_.data = current_velocity_level_;
+    pad_current_velocity_level_pub_.publish(current_velocity_level_msg_);
+  });
   // initialize variables
   current_velocity_level_ = 0.1;
   velocity_level_step_ = 0.1;
@@ -60,12 +69,46 @@ void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string&
   min_velocity_level_ = 0.1;
   cmd_twist_ = geometry_msgs::Twist();
   movement_status_msg_ = robotnik_pad_msgs::MovementStatus();
+  current_velocity_level_msg_ = std_msgs::Float64();
   kinematic_mode_ = KinematicModes::Differential;
 
   last_accel_time_ = ros::Time::now();
   last_accel_value_ = 0.0;
   watchdog_activated_ = false;
+
 }
+
+
+
+bool PadPluginMovement::setVelocityLevel(robotnik_msgs::SetFloat64::Request &req, robotnik_msgs::SetFloat64::Response &res)
+{
+  req.data = round(req.data * 10) / 10;
+
+  if(req.data < min_velocity_level_)
+  {
+    current_velocity_level_ = min_velocity_level_;
+    res.ret.message = "Velocity level out of range. Using min velocity level: " + std::to_string(int(min_velocity_level_ * 100)) + "%";
+  }
+  else if (req.data > max_velocity_level_)
+  {
+    current_velocity_level_ = max_velocity_level_;
+    res.ret.message = "Velocity level out of range. Using max velocity level: " + std::to_string(int(max_velocity_level_ * 100)) + "%";
+  }
+  else
+  {
+    current_velocity_level_ = req.data;
+    res.ret.message = "Velocity level set to " + std::to_string(int(current_velocity_level_ * 100)) + "%";
+  }
+
+  ROS_WARN("PadPluginMovement::setVelocityLevel: velocity level set to %.1f%%", current_velocity_level_ * 100.0);
+
+  res.ret.success = true;
+  res.ret.code = 0;
+  current_velocity_level_msg_.data = current_velocity_level_;
+  pad_current_velocity_level_pub_.publish(current_velocity_level_msg_);
+  return true;
+}
+
 
 void PadPluginMovement::execute(const std::vector<Button>& buttons, std::vector<float>& axes)
 {

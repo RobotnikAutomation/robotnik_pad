@@ -5,6 +5,10 @@
 #include <robotnik_pad/generic_pad_plugin.h>
 #include <robotnik_pad_msgs/MovementStatus.h>
 
+#include <robotnik_msgs/SetFloat64.h>
+#include <std_msgs/Float64.h>
+
+
 namespace KinematicModes
 {
   enum KinematicMode
@@ -29,6 +33,7 @@ public:
 
   virtual void initialize(const ros::NodeHandle& nh, const std::string& plugin_ns);
   virtual void execute(const std::vector<Button>& buttons, std::vector<float>& axes);
+  
 
 protected:
   int button_dead_man_, axis_linear_x_, axis_linear_y_, axis_angular_z_, button_kinematic_mode_;
@@ -36,9 +41,12 @@ protected:
   double max_linear_speed_, max_angular_speed_;
   std::string cmd_topic_vel_;
 
-  ros::Publisher twist_pub_, pad_status_pub_;
+  ros::Publisher twist_pub_, pad_status_pub_, pad_current_velocity_level_pub_;
+  ros::ServiceServer set_velocity_level_srv_;
+  ros::Timer velocity_publisher_timer_;
 
   robotnik_pad_msgs::MovementStatus movement_status_msg_;
+  std_msgs::Float64 current_velocity_level_msg_;
   //! current velocity level used to compute the target velocity
   double current_velocity_level_;
   //! max velocity level allowed (Normally 1.0)
@@ -64,8 +72,13 @@ protected:
   ros::Time last_accel_time_;
   //! flag to monitor if the robot watchdog is activated
   bool watchdog_activated_;
+  //! Service to set the current velocity level
+  bool setVelocityLevel(robotnik_msgs::SetFloat64::Request &req, robotnik_msgs::SetFloat64::Response &res);
+
+  
 protected:
   std::string kinematicModeToStr(int kinematic_mode);
+  
 };
 }  // namespace pad_plugins
 #endif  // PAD_PLUGIN_ELEVATOR_H_
