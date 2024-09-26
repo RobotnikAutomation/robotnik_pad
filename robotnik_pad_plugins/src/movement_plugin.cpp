@@ -99,6 +99,9 @@ bool PadPluginMovement::setVelocityLevel(robotnik_msgs::SetFloat64::Request &req
     current_velocity_level_ = req.data;
     res.ret.message = "Velocity level set to " + std::to_string(int(current_velocity_level_ * 100)) + "%";
   }
+
+  ROS_WARN("PadPluginMovement::setVelocityLevel: velocity level set to %.1f%%", current_velocity_level_ * 100.0);
+
   res.ret.success = true;
   res.ret.code = 0;
   current_velocity_level_msg_.data = current_velocity_level_;
