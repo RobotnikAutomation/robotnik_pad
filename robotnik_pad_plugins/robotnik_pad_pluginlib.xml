@@ -20,4 +20,8 @@
     <class name="robotnik_pad_plugins/BlkArc" type="pad_plugins::PadPluginBlkArc" base_class_type="pad_plugins::GenericPadPlugin">
         <description>This is the BLK ARC plugin.</description>
     </class>
+    <class name="robotnik_pad_plugins/ChangeVoguiAckermann" type="pad_plugins::PadPluginChangeVoguiAckermann"
+        base_class_type="pad_plugins::GenericPadPlugin">
+        <description>This is the Pad Change Vogui Ackermann plugin.</description>
+    </class>
 </library>
