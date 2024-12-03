@@ -40,8 +40,9 @@ void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string&
   //watchdog params
   use_accel_watchdog_ = false;
   readParam(pnh_, "config/use_accel_watchdog", use_accel_watchdog_, use_accel_watchdog_, not_required);
-  axis_accel_watchdog_ = 8;
-  readParam(pnh_, "config/axis_watchdog", axis_accel_watchdog_, axis_accel_watchdog_, not_required);
+
+  axis_accel_watchdog_ = getIntParamAsVector(pnh_, "config/axis_watchdog", 8);
+
   watchdog_duration_ = 0.5;
   readParam(pnh_, "config/watchdog_duration", watchdog_duration_, watchdog_duration_, not_required);
   
@@ -71,14 +72,14 @@ void PadPluginMovement::initialize(const ros::NodeHandle& nh, const std::string&
   movement_status_msg_ = robotnik_pad_msgs::MovementStatus();
   current_velocity_level_msg_ = std_msgs::Float64();
   kinematic_mode_ = KinematicModes::Differential;
-
-  last_accel_time_ = ros::Time::now();
-  last_accel_value_ = 0.0;
+  for (int i = 0; i < axis_accel_watchdog_.size(); i++)
+  {
+    last_accel_value_.push_back(0.0);
+    last_accel_time_.push_back(ros::Time::now());
+  }
+  
   watchdog_activated_ = false;
-
 }
-
-
 
 bool PadPluginMovement::setVelocityLevel(robotnik_msgs::SetFloat64::Request &req, robotnik_msgs::SetFloat64::Response &res)
 {
@@ -110,6 +111,56 @@ bool PadPluginMovement::setVelocityLevel(robotnik_msgs::SetFloat64::Request &req
 }
 
 
+
+std::vector<int> PadPluginMovement::getIntParamAsVector(ros::NodeHandle& nh, const std::string& param_name, const int& default_value)
+{
+  std::vector<int> result;
+
+  if (nh.hasParam(param_name))
+  {
+    XmlRpc::XmlRpcValue param_value;
+    nh.getParam(param_name, param_value);
+
+    if (param_value.getType() == XmlRpc::XmlRpcValue::TypeInt)
+    {
+      // If the parameter is an integer, create a vector with that single integer
+      result.push_back(static_cast<int>(param_value));
+    }
+    else if (param_value.getType() == XmlRpc::XmlRpcValue::TypeArray)
+    {
+      // If the parameter is an array, convert it to a std::vector
+      for (int i = 0; i < param_value.size(); ++i)
+      {
+        if (param_value[i].getType() == XmlRpc::XmlRpcValue::TypeInt)
+        {
+          result.push_back(static_cast<int>(param_value[i]));
+        }
+        else
+        {
+          ROS_WARN("Parameter '%s' contains non-integer values. Skipping.", param_name.c_str());
+        }
+      }
+      if (result.size() == 0)
+      {
+        ROS_ERROR("Parameter '%s' does not contain any integer value. Using default value %d", param_name.c_str(), default_value);
+        result.push_back(static_cast<int>(default_value));
+      }
+    }
+    else
+    {
+      ROS_ERROR("Parameter '%s' is neither an integer nor an array. Using default value %d", param_name.c_str(), default_value);
+      result.push_back(static_cast<int>(default_value));
+    }
+  }
+  else
+  {
+    ROS_ERROR("Parameter '%s' not found on the parameter server. Using default value %d", param_name.c_str(), default_value);
+    result.push_back(static_cast<int>(default_value)); 
+  }
+
+  return result;
+}
+
 void PadPluginMovement::execute(const std::vector<Button>& buttons, std::vector<float>& axes)
 {
   if (buttons[button_dead_man_].isPressed())
@@ -118,13 +169,20 @@ void PadPluginMovement::execute(const std::vector<Button>& buttons, std::vector<
     if (use_accel_watchdog_)
     {
       // If new accelerameter value is different to last, we update watchdog values
-      if (last_accel_value_ != axes[axis_accel_watchdog_])
+      bool check_watchdog = true;
+      int i;
+      for (i = 0; i < axis_accel_watchdog_.size(); i++)
       {
-        last_accel_value_ = axes[axis_accel_watchdog_];
-        last_accel_time_ = ros::Time::now();
-        watchdog_activated_ = false;
+        if (last_accel_value_[i] != axes[axis_accel_watchdog_[i]])
+        {
+          last_accel_value_[i] = axes[axis_accel_watchdog_[i]];
+          last_accel_time_[i] = ros::Time::now();
+          watchdog_activated_ = false;
+          check_watchdog = false;
+        }
       }
-      else
+
+      if (check_watchdog)
       {
         if (watchdog_activated_)
         {
@@ -132,7 +190,17 @@ void PadPluginMovement::execute(const std::vector<Button>& buttons, std::vector<
           return;
         }
         // If watchdog is expired, we stop the robot
-        if (ros::Time::now() - last_accel_time_ > ros::Duration(watchdog_duration_))
+        bool timedout = true;
+        for (i = 0; i < last_accel_time_.size(); i++)
+        {
+          if (ros::Time::now() - last_accel_time_[i] < ros::Duration(watchdog_duration_))
+          {
+            timedout = false;
+            break;
+          }
+        }
+
+        if (timedout)
         {
           ROS_WARN("PadPluginMovement::execute: Accelerometer watchdog timedout!");
           cmd_twist_.linear.x = 0.0;
