@@ -63,13 +63,13 @@ protected:
   //! flag to use accelerometer as watchdog
   bool use_accel_watchdog_;
   //! accelerometer axis used for watchdog
-  int axis_accel_watchdog_;
+  std::vector<int> axis_accel_watchdog_;
   //! time to activate the watchdog
   double watchdog_duration_;
   //! last acceleration value
-  double last_accel_value_;
+  std::vector<double> last_accel_value_;
   //! last time new accelerometer value read
-  ros::Time last_accel_time_;
+  std::vector<ros::Time> last_accel_time_;
   //! flag to monitor if the robot watchdog is activated
   bool watchdog_activated_;
   //! Service to set the current velocity level
@@ -79,6 +79,8 @@ protected:
 protected:
   std::string kinematicModeToStr(int kinematic_mode);
   
+  std::vector<int> getIntParamAsVector(ros::NodeHandle& nh, const std::string& param_name, const int& default_value);
+
 };
 }  // namespace pad_plugins
 #endif  // PAD_PLUGIN_ELEVATOR_H_
