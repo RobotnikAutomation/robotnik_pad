@@ -127,9 +127,13 @@ void PadPluginSetOutput::execute(const std::vector<Button>& buttons, std::vector
 {
   if (buttons[button_dead_man_].isPressed())
   {
-    if (((axes[axis_set_output_] > 0.95 && !use_buttons_) || (buttons[button_set_output_].isReleased() && use_buttons_)) && checkCondition())
+    if ((axes[axis_set_output_] > 0.95 && !use_buttons_) || (buttons[button_set_output_].isReleased() && use_buttons_))
     {
-      if (!output_sent_)
+      if (!checkCondition())
+      {
+        ROS_ERROR_NAMED("PadPluginSetOutput", "PadPluginSetOutput::execute: Conditions not met for output activation");
+      }
+      else if (!output_sent_)
       {
         ROS_INFO_NAMED("PadPluginSetOutput", "PadPluginSetOutput::execute: Setting outputs...");
         output_sent_ = true;
@@ -137,9 +141,13 @@ void PadPluginSetOutput::execute(const std::vector<Button>& buttons, std::vector
         init_timeout_ = ros::Time::now();
       }
     }
-    if (((axes[axis_set_output_] < -0.95  && !use_buttons_) || (buttons[button_reset_output_].isReleased() && use_buttons_)) && checkCondition())
+    if ((axes[axis_set_output_] < -0.95  && !use_buttons_) || (buttons[button_reset_output_].isReleased() && use_buttons_))
     {
-      if (!output_sent_)
+      if (!checkCondition())
+      {
+        ROS_ERROR_NAMED("PadPluginSetOutput", "PadPluginSetOutput::execute: Conditions not met for output deactivation");
+      }
+      else if (!output_sent_)
       {
         ROS_INFO_NAMED("PadPluginSetOutput", "PadPluginSetOutput::execute: Resetting outputs...");
         output_sent_ = true;
