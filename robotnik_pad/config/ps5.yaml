@@ -1,0 +1,31 @@
+robotnik_pad:
+  ros__parameters:
+    desired_freq: 10.0
+    pad:
+      num_of_buttons: 10
+      num_of_axes: 6
+      joy_topic: joy
+      joy_timeout: 1.0
+    plugins:
+      - Movement1
+      - Movement2
+    
+    Movement1:
+      type: robotnik_pad_plugins/Movement
+      max_linear_speed: 1.0
+      max_angular_speed: 1.5
+      cmd_topic_vel: pad_teleop/cmd_vel
+      config:
+        button_deadman: 5
+        axis_linear_x: 1
+        axis_linear_y: 0
+        axis_angular_z: 3
+        button_speed_up: 2
+        button_speed_down: 0
+        button_kinematic_mode: 7
+        use_accel_watchdog: true
+        axis_watchdog: [8,9,10]
+        watchdog_duration: 0.5
+
+    Movement2:
+      type: robotnik_pad_plugins/Movement
