@@ -35,6 +35,8 @@ protected:
     void increaseSpeed();
     void changeKinematicMode();
     void setSpeed(std::vector<Axes>& axes);
+    void stopRobot();
+    void checkWatchdog(std::vector<Axes>& axes);
 
     uint8_t button_deadman_;
     uint8_t axis_linear_x_;
