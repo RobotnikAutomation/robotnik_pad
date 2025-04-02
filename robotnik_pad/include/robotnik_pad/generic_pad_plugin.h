@@ -4,7 +4,6 @@
 #include <robotnik_pad/button.h>
 #include <robotnik_pad/axes.h>
 #include <rclcpp/rclcpp.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <vector>
 #include <sstream>
 
@@ -12,8 +11,6 @@ namespace pad_plugins
 {
 class GenericPadPlugin
 {
-public:
-    typedef boost::scoped_ptr<GenericPadPlugin> Ptr;
 
 public:
     virtual void initialize(const rclcpp::Node::SharedPtr& node, const std::string& plugin_ns) = 0;
