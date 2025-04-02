@@ -22,7 +22,9 @@ public:
             is_released_ = true;
         }
         else if (is_released_ and value)
+        {
             is_released_ = false;
+        }
 
         is_pressed_ = value;
     }
