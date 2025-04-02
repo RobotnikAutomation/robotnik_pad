@@ -2,15 +2,14 @@ robotnik_pad:
   ros__parameters:
     desired_freq: 10.0
     pad:
-      num_of_buttons: 10
-      num_of_axes: 6
+      num_of_buttons: 13
+      num_of_axes: 14
       joy_topic: joy
       joy_timeout: 1.0
     plugins:
-      - Movement1
-      - Movement2
+      - Movement
     
-    Movement1:
+    Movement:
       type: robotnik_pad_plugins/Movement
       max_linear_speed: 1.0
       max_angular_speed: 1.5
@@ -26,6 +25,3 @@ robotnik_pad:
         use_accel_watchdog: true
         axis_watchdog: [8,9,10]
         watchdog_duration: 0.5
-
-    Movement2:
-      type: robotnik_pad_plugins/Movement
