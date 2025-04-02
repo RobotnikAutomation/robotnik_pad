@@ -24,13 +24,14 @@ void RobotnikPad::rosReadParams()
         desired_freq_ = DEFAULT_THREAD_DESIRED_HZ;
     }
 
-    uint8_t default_num_of_butons = 0;
-    RobotnikPad::readParam("pad.num_of_buttons", num_of_buttons_, default_num_of_butons, true);
-    uint8_t default_num_of_axes = 0;
-    RobotnikPad::readParam("pad.num_of_axes", num_of_axes_, default_num_of_axes, true);
-    std::string default_joy_topic_name = "joy";
-    RobotnikPad::readParam("pad.joy_topic", joy_topic_, default_joy_topic_name, false);
-    RobotnikPad::readParam("pad.joy_timeout", joy_timeout_, 5.0, false);
+    num_of_buttons_ = 0;
+    RobotnikPad::readParam("pad.num_of_buttons", num_of_buttons_, num_of_buttons_, true);
+    num_of_axes_ = 0;
+    RobotnikPad::readParam("pad.num_of_axes", num_of_axes_, num_of_axes_, true);
+    joy_topic_ = "joy";
+    RobotnikPad::readParam("pad.joy_topic", joy_topic_, joy_topic_, false);
+    joy_timeout_ = 5.0;
+    RobotnikPad::readParam("pad.joy_timeout", joy_timeout_, joy_timeout_, false);
 
     std::vector<std::string> plugin_names;
     this->declare_parameter("plugins", std::vector<std::string>());
@@ -40,11 +41,13 @@ void RobotnikPad::rosReadParams()
 
 void RobotnikPad::setup()
 {
+    buttons_.reserve(num_of_buttons_);
     for (int i = 0; i < num_of_buttons_; i++)
     {
         buttons_.push_back(Button());
     }
 
+    axes_.reserve(num_of_axes_);
     for (int i = 0; i < num_of_axes_; i++)
     {
         axes_.push_back(Axes());
@@ -52,6 +55,8 @@ void RobotnikPad::setup()
 
     pad_plugins_loader_ = new pluginlib::ClassLoader<pad_plugins::GenericPadPlugin>("robotnik_pad", "pad_plugins::" "GenericPadPlugin");
 
+    size_t num_plugins = plugins_from_params_.size();
+    plugins_.reserve(num_plugins);
     for (auto& param_plugin : plugins_from_params_)
     {
         std::shared_ptr<pad_plugins::GenericPadPlugin> plugin;
@@ -116,12 +121,32 @@ void RobotnikPad::readPluginsFromParams(const std::vector<std::string>& names, s
 
 void RobotnikPad::joyCb(const sensor_msgs::msg::Joy::SharedPtr msg)
 {
-    for (unsigned int i = 0; i < msg->buttons.size(); i++)
+    if (msg->buttons.size() != buttons_.size() || msg->axes.size() != axes_.size())
+    {
+        if (msg->buttons.size() != buttons_.size())
+        {
+            RCLCPP_WARN_STREAM_THROTTLE(this->get_logger(), *this->get_clock(), 1000,
+                    "Received joy message has a different number of buttons than the configuration. " <<
+                    "Received: " << msg->buttons.size() << ", Configured: " << buttons_.size() <<
+                    ". Ignoring pad commands.");
+        }
+        if (msg->axes.size() != axes_.size())
+        {
+            RCLCPP_WARN_STREAM_THROTTLE(this->get_logger(), *this->get_clock(), 1000,
+                    "Received joy message has a different number of axes than the configuration. " <<
+                    "Received: " << msg->axes.size() << ", Configured: " << axes_.size() <<
+                    ". Ignoring pad commands.");
+        }
+        joy_topic_last_time_received_ = this->now();
+        return;
+    }
+
+    for (size_t i = 0; i < buttons_.size(); i++)
     {
         buttons_[i].press(msg->buttons[i]);
     }
 
-    for (unsigned int i = 0; i < msg->axes.size(); i++)
+    for (size_t i = 0; i < msg->axes.size(); i++)
     {
         axes_[i].press(msg->axes[i]);
     }
@@ -134,22 +159,21 @@ void RobotnikPad::controlLoop()
     if ((this->now() - joy_topic_last_time_received_).seconds() > joy_timeout_)
     {
         RCLCPP_WARN_STREAM_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Topic " << joy_topic_ << " is not being received");
+        return;
     }
-    else
+
+    for (auto& plugin : plugins_)
     {
-        for (auto& plugin : plugins_)
-        {
-            plugin->execute(buttons_, axes_);
-        }
+        plugin->execute(buttons_, axes_);
+    }
 
-        for (auto& button : buttons_)
-        {
-            button.resetReleased();
-        }
+    for (auto& button : buttons_)
+    {
+        button.resetReleased();
+    }
 
-        for (auto& axis : axes_)
-        {
-            axis.resetReleased();
-        }
+    for (auto& axis : axes_)
+    {
+        axis.resetReleased();
     }
 }
