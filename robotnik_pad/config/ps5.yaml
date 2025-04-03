@@ -2,7 +2,7 @@ robotnik_pad:
   ros__parameters:
     desired_freq: 10.0
     pad:
-      num_of_buttons: 13
+      num_of_buttons: 14
       num_of_axes: 14
       joy_topic: joy
       joy_timeout: 1.0
@@ -19,9 +19,9 @@ robotnik_pad:
         axis_linear_x: 1
         axis_linear_y: 0
         axis_angular_z: 3
-        button_speed_up: 2
-        button_speed_down: 0
+        button_speed_up: 3
+        button_speed_down: 1
         button_kinematic_mode: 7
         use_accel_watchdog: true
-        axis_watchdog: [8,9,10]
+        axis_watchdog: [6,7,8]
         watchdog_duration: 0.5
