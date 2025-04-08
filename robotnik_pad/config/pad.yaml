@@ -18,7 +18,7 @@ robotnik_pad:
         button_deadman: 5
         axis_linear_x: 1
         axis_linear_y: 0
-        axis_angular_z: 3
+        axis_angular_z: 2
         button_speed_up: 3
         button_speed_down: 1
         button_kinematic_mode: 7
