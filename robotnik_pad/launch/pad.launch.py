@@ -67,6 +67,14 @@ def generate_launch_description():
     )
     add_to_launcher.add_arg(arg)
 
+    arg = ExtendedArgument(
+        name='autorepeat_rate',
+        description='Rate in Hz at which a joystick that has a non-changing state will resend the previously sent message',
+        default_value='0.0',
+        use_env=False
+    )
+    add_to_launcher.add_arg(arg)
+
     # Robotnik pad
     arg = ExtendedArgument(
         name='config_file',
@@ -108,8 +116,9 @@ def generate_launch_description():
                 output = 'screen',
                 parameters = [
                     {
-                        'device': params['device'],
+                        'dev': params['device'],
                         'deadzone': params['deadzone'],
+                        'autorepeat_rate': params['autorepeat_rate']
                     }
                 ],
                 arguments=[
