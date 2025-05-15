@@ -1,169 +1,118 @@
 from launch import LaunchDescription
-from launch.actions import GroupAction
+from launch.actions import DeclareLaunchArgument, GroupAction
 from launch_ros.actions import Node, PushRosNamespace
-from launch_ros.substitutions import FindPackageShare
+from launch.substitutions import LaunchConfiguration, PythonExpression, EnvironmentVariable
+from ament_index_python.packages import get_package_share_directory
 from launch.conditions import IfCondition
-from robotnik_common.launch import ExtendedArgument
-from robotnik_common.launch import AddArgumentParser
-from robotnik_common.launch import RewrittenYaml
-from launch.substitutions import PythonExpression
+import os
 
 def generate_launch_description():
 
-    ld = LaunchDescription()
-    add_to_launcher = AddArgumentParser(ld)
+    # Declare launch arguments
+    declared_arguments = [
+        DeclareLaunchArgument(
+            name='robot_id',
+            default_value=EnvironmentVariable('ROBOT_ID', default_value='robot'),
+            description='Robot ID'
+        ),
+        DeclareLaunchArgument(
+            name='log_level',
+            default_value=EnvironmentVariable('LOG_LEVEL', default_value='info'),
+            description='Log level',
+        ),
 
-    arg = ExtendedArgument(
-        name='robot_id',
-        description='Robot ID',
-        default_value='robot',
-        use_env=True,
-        environment='ROBOT_ID',
-    )
-    add_to_launcher.add_arg(arg)
+        # PS5 pad driver
+        DeclareLaunchArgument(
+            name='desired_freq',
+            default_value='40.0',
+            description='Desired frequency for PS5 pad driver',
+        ),
+        DeclareLaunchArgument(
+            name='serial_number',
+            default_value='',
+            description='Serial number of the PS5 pad',
+        ),
+        DeclareLaunchArgument(
+            name='deadzone',
+            default_value=EnvironmentVariable('ROBOT_PAD_DEADZONE', default_value='0.1'),
+            description='Deadzone for the joystick',
+        ),
 
-    arg = ExtendedArgument(
-        name='log_level',
-        description='Log level',
-        default_value='info',
-        use_env=True,
-        environment='LOG_LEVEL',
-    )
-    add_to_launcher.add_arg(arg)
+        # PS4 pad driver (joy)
+        DeclareLaunchArgument(
+            name='device',
+            default_value=EnvironmentVariable('ROBOT_PAD_DEV', default_value='/dev/input/js_base'),
+            description='Device of the PS4 pad',
+        ),
+        DeclareLaunchArgument(
+            name='autorepeat_rate',
+            default_value='0.0',
+            description='Rate in Hz at which a joystick that has a non-changing state will resend the previously sent message',
+        ),
+        DeclareLaunchArgument(
+            name='pad_model',
+            default_value=EnvironmentVariable('ROBOT_PAD_MODEL', default_value='ps5'),
+            description='Pad model: ps4 or ps5',
+        )
+    ]
 
-    # PS5 pad driver
-    arg = ExtendedArgument(
-        name='desired_freq',
-        description = 'Desired frequency',
-        default_value='40.0',
-        use_env=False
-    )
-    add_to_launcher.add_arg(arg)
+    config_file = os.path.join(get_package_share_directory("robotnik_pad"),
+                'config', 'pad.yaml')
 
-    arg = ExtendedArgument(
-        name='serial_number',
-        description='Serial number of the PS5 pad',
-        default_value='',
-        use_env=False
-    )
-    add_to_launcher.add_arg(arg)
-
-    arg = ExtendedArgument(
-        name = 'deadzone',
-        description = 'Deadzone for the joystick',
-        default_value = '0.1',
-        use_env = True,
-        environment = 'ROBOT_PAD_DEADZONE'
-    )
-    add_to_launcher.add_arg(arg)
-
-    # PS4 pad driver (joy)
-    arg = ExtendedArgument(
-        name='device',
-        description='Device of the PS4 pad',
-        default_value='/dev/input/js_base',
-        use_env=True,
-        environment='ROBOT_PAD_DEV'
-    )
-    add_to_launcher.add_arg(arg)
-
-    arg = ExtendedArgument(
-        name='autorepeat_rate',
-        description='Rate in Hz at which a joystick that has a non-changing state will resend the previously sent message',
-        default_value='0.0',
-        use_env=False
-    )
-    add_to_launcher.add_arg(arg)
-
-    # Robotnik pad
-    arg = ExtendedArgument(
-        name='config_file',
-        description='Path to the configuration file',
-        default_value=[
-            FindPackageShare("robotnik_pad"),
-            '/config/pad.yaml'
-        ],
-        use_env=False
-    )
-    add_to_launcher.add_arg(arg)
-
-    arg = ExtendedArgument(
-        name = 'pad_model',
-        description = 'Pad model',
-        default_value = 'ps5',
-        use_env = True,
-        environment = 'ROBOT_PAD_MODEL'
-    )
-    add_to_launcher.add_arg(arg)
-
-    params = add_to_launcher.process_arg()
-    config_file_rewritten = RewrittenYaml(
-        source_file = params['config_file'],
-        root_key = params['robot_id'],
-        param_rewrites = {},
-        convert_types = True
-    )
+    # Create LaunchConfigurations
+    robot_id = LaunchConfiguration('robot_id')
+    log_level = LaunchConfiguration('log_level')
+    desired_freq = LaunchConfiguration('desired_freq')
+    serial_number = LaunchConfiguration('serial_number')
+    deadzone = LaunchConfiguration('deadzone')
+    device = LaunchConfiguration('device')
+    autorepeat_rate = LaunchConfiguration('autorepeat_rate')
+    pad_model = LaunchConfiguration('pad_model')
 
     load_nodes = GroupAction(
-        actions = [
-            PushRosNamespace(
-                namespace = params['robot_id'],
-            ),
+        actions=[
+            PushRosNamespace(namespace=robot_id),
+
             Node(
-                package = 'joy_linux',
-                executable = 'joy_linux_node',
-                name = 'joy_node',
-                output = 'screen',
-                parameters = [
-                    {
-                        'dev': params['device'],
-                        'deadzone': params['deadzone'],
-                        'autorepeat_rate': params['autorepeat_rate']
-                    }
-                ],
-                arguments=[
-                    '--ros-args',
-                    '--log-level',
-                    params['log_level']
-                ],
-                condition = IfCondition(
-                    PythonExpression(
-                        ['"', params['pad_model'], '" == "ps4"']
-                    )
+                package='joy_linux',
+                executable='joy_linux_node',
+                name='joy_node',
+                output='screen',
+                parameters=[{
+                    'dev': device,
+                    'deadzone': deadzone,
+                    'autorepeat_rate': autorepeat_rate
+                }],
+                arguments=['--ros-args', '--log-level', log_level],
+                condition=IfCondition(
+                    PythonExpression(['"', pad_model, '" == "ps4"'])
                 )
             ),
+
             Node(
-                package = 'ps5_pad_driver',
-                executable = 'robotnik_joy',
-                name = 'joy_node',
-                output = 'screen',
-                parameters = [
-                    {
-                        'serial_number': params['serial_number'],
-                        'deadzone': params['deadzone'],
-                        'desired_freq': params['desired_freq'],
-                    }
-                ],
-                condition = IfCondition(
-                    PythonExpression(
-                        ['"', params['pad_model'], '" == "ps5"']
-                    )
-                ),
+                package='ps5_pad_driver',
+                executable='robotnik_joy',
+                name='joy_node',
+                output='screen',
+                parameters=[{
+                    'serial_number': serial_number,
+                    'deadzone': deadzone,
+                    'desired_freq': desired_freq
+                }],
+                condition=IfCondition(
+                    PythonExpression(['"', pad_model, '" == "ps5"'])
+                )
             ),
+
             Node(
-                package = 'robotnik_pad',
-                executable = 'robotnik_pad',
-                name = 'robotnik_pad',
-                output = 'screen',
-                parameters = [config_file_rewritten],
-                arguments=[
-                    '--ros-args',
-                    '--log-level',
-                    params['log_level']
-                ]
+                package='robotnik_pad',
+                executable='robotnik_pad',
+                name='robotnik_pad',
+                output='screen',
+                parameters=[config_file],
+                arguments=['--ros-args', '--log-level', log_level]
             )
         ]
     )
 
-    ld.add_action(load_nodes)
-    return ld
+    return LaunchDescription(declared_arguments + [load_nodes])

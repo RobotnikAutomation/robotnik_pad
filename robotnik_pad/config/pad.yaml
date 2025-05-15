@@ -1,4 +1,4 @@
-robotnik_pad:
+/**:
   ros__parameters:
     desired_freq: 10.0
     pad:
