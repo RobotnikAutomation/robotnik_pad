@@ -23,8 +23,8 @@ namespace pad_plugins
 
         readParam(pnh_, "config/button_deadman", button_dead_man_, button_dead_man_, required);
         readParam(pnh_, "config/button_home", button_home_, button_home_, required);
-        readParam(pnh_, "config/button_pan", button_vertical_arrow_, button_vertical_arrow_, required);
-        readParam(pnh_, "config/button_tilt", button_horizontal_arrow_, button_horizontal_arrow_, required);
+        readParam(pnh_, "config/button_tilt", button_vertical_arrow_, button_vertical_arrow_, required);
+        readParam(pnh_, "config/button_pan", button_horizontal_arrow_, button_horizontal_arrow_, required);
         readParam(pnh_, "config/inverted_tilt_ptz", inverted_tilt_ptz_, inverted_tilt_ptz_, false);
         readParam(pnh_, "config/inverted_pan_ptz", inverted_pan_ptz_, inverted_pan_ptz_, false);
         
