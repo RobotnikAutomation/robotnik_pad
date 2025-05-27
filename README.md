@@ -206,5 +206,5 @@ Arguments loaded by the PS4 joy node:
 * **device** (double, default: $ROBOT_PAD_DEV (if set), otherwise: '/dev/input/js_base'): Device of the PS4 pad.
 * **autorepeat_rate** (double, default: 0.0): Rate in Hz at which a joystick that has a non-changing state will resend the previously sent message.
 
-#### 1.10.2. Loaded config files
+### 1.10.2. Loaded config files
 * **robotnik_pad/config/pad.yaml**
