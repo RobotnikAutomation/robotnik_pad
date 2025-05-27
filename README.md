@@ -7,11 +7,11 @@ This package is intended to be used as a standard pad for all Robotnik robots.
 
 To use this package with a PS5 Dualsense pad, it is necessary to install:
 
-- [ps5_pad_driver] (https://github.com/RobotnikAutomation/ps5_pad_driver)
+- [ps5_pad_driver](https://github.com/RobotnikAutomation/ps5_pad_driver)
 
 To use it with ps4:
 
-- [joy_linux] (https://index.ros.org/p/joy_linux/)
+- [joy_linux](https://index.ros.org/p/joy_linux/)
 
 This package may depend on other Robotnik or ROS standard packages in function of the handlers that are developed. The standard ROS packages can be installed using the rosdep install command:
 
