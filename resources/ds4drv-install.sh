@@ -49,41 +49,44 @@ no_colour='\033[0m'
 err_str_root_permission="You need root privileges try:\nsudo ${0}"
 
 #udev
-udev_rule_file="${dir}/55-ds4drv.rules"
+udev_rule_file="55-ds4drv.rules"
+udev_rule_origin="${dir}/${udev_rule_file}"
 udev_rule_destiny="/etc/udev/rules.d/${udev_rule_file}"
 
-udev_rule_copy_command="cp ${udev_rule_file} ${udev_rule_destiny}"
+udev_rule_copy_command="cp ${udev_rule_origin} ${udev_rule_destiny}"
 udev_reload_rules_command="udevadm control --reload-rules && udevadm trigger"
 
 suc_str_udev_install='udev rules active'
 
-err_str_udev_copy="error copying udev rules ${udev_rule_file}"
+err_str_udev_copy="error copying udev rules ${udev_rule_origin}"
 err_str_udev_reload="error reloading udev rules"
 
 nfo_str_udev_install='Installing udev rules'
 
 # config
-config_file="${dir}/ds4drv.conf"
+config_file="ds4drv.conf"
+config_file_origin="${dir}/${config_file}"
 config_file_destiny="/etc/${config_file}"
 
-config_copy_command="cp ${config_file} ${config_file_destiny}"
+config_copy_command="cp ${config_file_origin} ${config_file_destiny}"
 
-err_str_config_copy="error copying config file ${config_file}"
+err_str_config_copy="error copying config file ${config_file_origin}"
 
 nfo_str_config_install="Configuring drivers"
 
 #systemd
-systemd_service_file="${dir}/ds4drv.service"
+systemd_service_file="ds4drv.service"
+systemd_service_origin="${dir}/${systemd_service_file}"
 systemd_service_destiny="/etc/systemd/system/${systemd_service_file}"
 
-systemd_service_copy_command="cp ${systemd_service_file} ${systemd_service_destiny}"
+systemd_service_copy_command="cp ${systemd_service_origin} ${systemd_service_destiny}"
 systemd_daemon_reload_command="systemctl daemon-reload"
 systemd_enable_service_command="systemctl enable ${systemd_service_file}"
 systemd_start_service_command="systemctl start ${systemd_service_file}"
 
 suc_str_systemd_install='systemd service active'
 
-err_str_systemd_copy="error copying systemd service ${systemd_service_file}"
+err_str_systemd_copy="error copying systemd service ${systemd_service_origin}"
 err_str_systemd_reload="error systemd reloading daemon"
 err_str_systemd_enable="error enabling ${systemd_service_file} systemd service"
 err_str_systemd_start="error starting ${systemd_service_file} systemd service"
@@ -96,6 +99,9 @@ ds4drv_search_python_command='which python'
 ds4drv_search_python3_command='which python3'
 ds4drv_search_pip_command='${python_bin} -m pip --version &>/dev/null'
 ds4drv_pip_install_ds4dr_command='${python_bin} -m pip install ds4drv'
+
+six_pip_install_command='${python_bin} -m pip install --force-reinstall six==1.13.0'
+evdev_pip_install_command='${python_bin} -m pip install --force-reinstall evdev==0.8.1'
 
 err_str_ds4drv_search_python='python not found'
 err_str_ds4drv_search_pip='pip in not installed'
@@ -203,6 +209,14 @@ function pip_install_ds4dr() {
 		print_error "${err_str_ds4drv_pip_install_ds4dr}"
 		return 1
 	fi
+}
+
+function pip_install_six() {
+	if ! eval "${python_bin} -m pip install six"; then
+		print_error "could not install six"
+		return 1
+	fi
+	return 0
 }
 
 function install_ds4drv() {

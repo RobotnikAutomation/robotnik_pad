@@ -72,6 +72,7 @@ Add the udev rules for PS5 controller:
 
 ```bash
 sudo cp resources/55-dualsense.rules /etc/udev/rules.d/
+sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
 
 ---
