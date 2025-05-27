@@ -75,7 +75,7 @@ sudo cp resources/55-dualsense.rules /etc/udev/rules.d/
 ```
 
 ---
-## 1. robotnik_pad node
+# 1. robotnik_pad node
 
 The `robotnik_pad` node loads plugins that specify the desired behaviour. This allows you to load different plugins depending on your needs. Besides, it is possible to create your own plugins.
 
@@ -83,8 +83,8 @@ Available plugins:
 * **Movement**
     * Intended to command the mobile base via velocity references
 
-### 1.1. Parameters
-#### 1.1.1. Common parameters
+## 1.1. Parameters
+### 1.1.1. Common parameters
 * ~**desired_freq** (double, default: 40): Frequency of the node.
 * ~**pad.num_of_buttons** (int, default: 0): Number of buttons published by the joy topic. Must be the same to work.
 * ~**pad.num_of_axes** (int, default: 0): Number of axes published by the joy topic. Must be the same to work.
@@ -92,10 +92,10 @@ Available plugins:
 * ~**pad.joy_timeout** (double, default: 5.0): Max time the node can wait without receiving joy messages.
 * ~**plugins** (list of strings, default: []): List of the pluginst to be loaded.
 
-#### 1.1.2. Plugin parameters
+### 1.1.2. Plugin parameters
 * ~***Plugin*.type** (string, default: ""): Type of plugin.
 
-##### 1.1.2.1. Movement plugin
+#### 1.1.2.1. Movement plugin
 * ~**max_linear_speed** (double, default: 1.5):  Maximum linear speed that can be sent to the controller based on the current velocity level (0.1->1) and the current axis_linear_x or axis_linear_y value (0->1).
 * ~**max_angular_speed** (double, default: 1.5): Maximum angular speed that can be sent to the controller based on the current velocity level (0.1->1) and the current axis_angular_z value (0->1).
 * ~**cmd_topic_vel** (string, default: cmd_vel): Name of topic where the command vel is being published.
