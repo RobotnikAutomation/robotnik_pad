@@ -77,7 +77,7 @@ sudo cp resources/55-dualsense.rules /etc/udev/rules.d/
 ---
 ## 1. robotnik_pad node
 
-The `robotnik_pad_node` loads plugins that specify the desired behaviour. This allows you to load different plugins depending on your needs. Besides, it is possible to create your own plugins.
+The `robotnik_pad` node loads plugins that specify the desired behaviour. This allows you to load different plugins depending on your needs. Besides, it is possible to create your own plugins.
 
 Available plugins:
 * **Movement**
@@ -108,7 +108,7 @@ Available plugins:
 * ~**config/axis_linear_y** (int, default: 0): Axis number to set the linear y speed.
 * ~**config/axis_angular_z** (int, default: 2) Axis number to set the angular speed.
 * ~**config/use_accel_watchdog** (bool, default: true): Flag to check if any of the defined watchdog axes is changing its value in order to keep publishing velocity commands.
-* ~**config/watchdog_duration** (double, default: 0.5): Time in seconds the node will wait wthout receiving changes in the watchdog axes before stopping publishing velocity commands.
+* ~**config/watchdog_duration** (double, default: 0.5): Time in seconds the node will wait without receiving changes in the watchdog axes before stopping publishing velocity commands.
 * ~**config/axis_watchdog** (list of ints, default: [8]): Axes used to monitor that the joy is updating buttons and axes. The defined axes should correspond to the accelerometers of the pad.
 
 ### 1.1.3. Configuration example
@@ -150,48 +150,48 @@ This an example of a config file loading a single plugin:
 First of all you need to define a list containing the different plugins you want to load. Then, for each of the plugins you want to load, you should specify its parameters.
 
 ## 1.2. Subscribed topics
-* **joy** ([sensor_msgs/msg/Joy](https://docs.ros2.org/foxy/api/sensor_msgs/msg/Joy.html)): Gets the buttons and axis status
+* **joy** ([sensor_msgs/msg/Joy](https://docs.ros2.org/foxy/api/sensor_msgs/msg/Joy.html)): Gets the buttons and axis status.
 
 ## 1.3. Published topics
 ### 1.3.1. Plugin published topics
 #### 1.3.1.1. Movement
 * **cmd_topic_vel** ([geometry_msgs/msg/Twist](https://docs.ros2.org/foxy/api/geometry_msgs/msg/Twist.html)): Sends the velocity references to defined topic.
 
-### 1.4. Services
+## 1.4. Services
 
 None
 
-### 1.5. Services Called
+## 1.5. Services Called
 
 None
 
-### 1.6. Action server
+## 1.6. Action server
 
 None
 
-### 1.7. Action clients called
+## 1.7. Action clients called
 
 None
 
-### 1.8. Required tf Transforms
+## 1.8. Required tf Transforms
 
 None
 
-### 1.9. Provided tf Transforms
+## 1.9. Provided tf Transforms
 
 None
 
-### 1.10. Bringup
+## 1.10. Bringup
 
 ```bash
 ros2 launch robotnik_pad pad.launch.py
 ```
 
 This will launch two nodes:
-- **joy_node**: This node is in charge of reading from the joystick and publish the information (sensor_msgs/msg/Joy) through a topic
-- **robotnik_pad**: This node will load the different plugins included in the config file
+- **joy_node**: This node is in charge of reading from the joystick and publishing the information (sensor_msgs/msg/Joy) through a topic.
+- **robotnik_pad**: This node will load the different plugins included in the config file.
 
-#### 1.10.1. Launch arguments
+### 1.10.1. Launch arguments
 
 * **robot_id** (string, default: $ROBOT_ID (if set), otherwise 'robot'): Namespace of the nodes.
 * **log_level** (string, default: $LOG_LEVEL (if set), otherwise: 'info'): Logger level.
