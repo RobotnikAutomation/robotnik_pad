@@ -9,7 +9,7 @@ RobotnikPad::RobotnikPad() : Node("robotnik_pad")
 void RobotnikPad::start()
 {
     setup();
-    
+
     double control_loop_period = 1.0 / desired_freq_;
     control_loop_timer_ = this->create_wall_timer(
         std::chrono::duration<double>(control_loop_period), std::bind(&RobotnikPad::controlLoop, this)
@@ -17,7 +17,7 @@ void RobotnikPad::start()
 }
 
 void RobotnikPad::rosReadParams()
-{   
+{
     RobotnikPad::readParam("desired_freq", desired_freq_, DEFAULT_THREAD_DESIRED_HZ, false);
     if (desired_freq_ <= 0)
     {
@@ -63,7 +63,7 @@ void RobotnikPad::setup()
         try
         {
             plugin = pad_plugins_loader_->createSharedInstance(param_plugin.second);
-            
+
         }
         catch (pluginlib::PluginlibException& ex)
         {
@@ -72,7 +72,7 @@ void RobotnikPad::setup()
                                                     << "Exception: " << ex.what());
             continue;
         }
-        
+
         plugin->initialize(this->shared_from_this(), param_plugin.first);
         plugins_.push_back(plugin);
     }
@@ -82,7 +82,7 @@ void RobotnikPad::rosSetup()
 {
     joy_sub_ = this->create_subscription<sensor_msgs::msg::Joy>(
         joy_topic_, 1, std::bind(&RobotnikPad::joyCb, this, std::placeholders::_1));
-    
+
     joy_topic_last_time_received_ = this->now();
 }
 
@@ -99,7 +99,7 @@ void RobotnikPad::readPluginsFromParams(const std::vector<std::string>& names, s
         }
 
         std::string type = "";
-        
+
         bool param_read = false;
         param_read = RobotnikPad::readParam(name + ".type", type, type, true);
         if (!param_read)
@@ -156,9 +156,11 @@ void RobotnikPad::joyCb(const sensor_msgs::msg::Joy::SharedPtr msg)
 
 void RobotnikPad::controlLoop()
 {
-    if ((this->now() - joy_topic_last_time_received_).seconds() > joy_timeout_)
+    // Skip if joy not received for a while
+    if ((now() - joy_topic_last_time_received_).seconds() > joy_timeout_)
     {
-        RCLCPP_WARN_STREAM_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Topic " << joy_topic_ << " is not being received");
+        RCLCPP_WARN_STREAM_THROTTLE(get_logger(), *get_clock(), 10000,
+                "No joy message received for " << joy_timeout_ << " seconds. Ignoring pad commands.");
         return;
     }
 
