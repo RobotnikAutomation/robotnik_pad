@@ -156,11 +156,12 @@ void RobotnikPad::joyCb(const sensor_msgs::msg::Joy::SharedPtr msg)
 
 void RobotnikPad::controlLoop()
 {
-    // Skip if joy not received for a while
+    // Check if the joy topic is being received within the timeout
     if ((now() - joy_topic_last_time_received_).seconds() > joy_timeout_)
     {
-        RCLCPP_WARN_STREAM_THROTTLE(get_logger(), *get_clock(), 10000,
-                "No joy message received for " << joy_timeout_ << " seconds. Ignoring pad commands.");
+        RCLCPP_DEBUG_THROTTLE(
+            get_logger(), *get_clock(), 5000,
+            "Topic '%s' is not being received", joy_topic_.c_str());
         return;
     }
 
