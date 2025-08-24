@@ -36,6 +36,7 @@ add_library(robotnik_pad_plugins
   src/poi_plugin.cpp
   src/ptz_plugin.cpp
   src/blkarc_plugin.cpp
+  src/set_output_plugin.cpp
 )
 
 add_dependencies(robotnik_pad_plugins ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
