@@ -209,3 +209,51 @@ Arguments loaded by the PS4 joy node:
 
 ### 1.10.2. Loaded config files
 * **robotnik_pad/config/pad.yaml**
+
+---
+
+## 2. Plugin Development
+
+The `robotnik_pad` system supports custom plugins. To create a new plugin package, use the provided plugin template generator script.
+
+### 2.1. Creating a New Plugin Package
+
+Use the `plugin_template_generator.sh` script located in the root of the repository:
+
+```bash
+./plugin_template_generator.sh
+```
+
+The script will:
+1. Ask for a plugin name (must use underscore_case, e.g., `my_custom_plugin`)
+2. Validate the plugin name format
+3. Create a new package named `<plugin_name>_pad_plugins`
+4. Generate all necessary files with proper naming conventions
+
+### 2.2. Example
+
+```bash
+$ ./plugin_template_generator.sh
+Enter the name of the plugin (use underscores, e.g., my_custom_plugin): my_robot_plugin
+
+Plugin name: my_robot_plugin
+Package name: my_robot_plugin_pad_plugins
+
+=== Plugin package created successfully! ===
+```
+
+This will create a package `my_robot_plugin_pad_plugins` with:
+- Complete ROS2 package structure
+- Header file: `include/my_robot_plugin_pad_plugins/my_robot_plugin_plugin.h`
+- Source file: `src/my_robot_plugin_plugin.cpp`
+- Plugin class: `PadPluginMyRobotPlugin`
+
+### 2.3. Next Steps After Generation
+
+1. Customize the plugin implementation in the generated `.cpp` file
+2. Build the package:
+   ```bash
+   colcon build --packages-select <plugin_name>_pad_plugins
+   ```
+3. Configure your pad.yaml to load the new plugin
+4. Test your plugin with the robotnik_pad node
