@@ -66,7 +66,8 @@ echo "Renaming files..."
 
 # Convert plugin_name to different formats
 # plugin_name -> PluginName (for class names)
-PLUGIN_CLASS=$(echo "$PLUGIN_NAME" | sed -E 's/(^|_)([a-z])/\U\2/g')
+# Using awk for better portability across different systems
+PLUGIN_CLASS=$(echo "$PLUGIN_NAME" | awk -F_ '{for(i=1;i<=NF;i++){$i=toupper(substr($i,1,1)) substr($i,2)}}1' OFS="")
 
 # Find and rename files
 cd "$TARGET_DIR"
@@ -136,6 +137,7 @@ if [ -f "$CPP_FILE" ]; then
             flag=0
             next
         }
+        flag && /^}/ { flag=0 }
         { print }
     ' "$CPP_FILE" > "${CPP_FILE}.tmp" && mv "${CPP_FILE}.tmp" "$CPP_FILE"
 fi
