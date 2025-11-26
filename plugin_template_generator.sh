@@ -78,7 +78,7 @@ if [ -f "include/robotnik_pad_plugins/movement_plugin.h" ]; then
     # Remove old directory if it's empty
     if [ -d "include/robotnik_pad_plugins" ]; then
         if [ -z "$(ls -A include/robotnik_pad_plugins)" ]; then
-            rmdir "include/robotnik_pad_plugins"
+            rmdir "include/robotnik_pad_plugins" || true
         fi
     fi
 fi
