@@ -209,3 +209,38 @@ Arguments loaded by the PS4 joy node:
 
 ### 1.10.2. Loaded config files
 * **robotnik_pad/config/pad.yaml**
+
+---
+
+## 2. Plugin Development
+
+The `robotnik_pad` system supports custom plugins. To create a new plugin package, use the provided plugin template generator script.
+
+### 2.1. Creating a New Plugin Package
+
+Use the `plugin_template_generator.sh` script located in the root of the repository. It will ask for a `<plugin_name>` to create the package.
+
+```bash
+./plugin_template_generator.sh
+```
+
+**Note:** The package will be created in the root of the repository. Consider moving it outside.
+
+Build the new package:
+
+```bash
+colcon build --packages-select <plugin_name>_pad_plugins
+```
+
+Add the configuration in `config/pad.yaml` from the `robotik_pad` package.
+
+```
+ros__parameters:
+  plugins:
+    - <PluginName>
+  
+  <PluginName>:
+    type: <plugin_name>_pad_plugins/<PluginName>
+    max_linear_speed: 1.0
+    max_angl...
+```
