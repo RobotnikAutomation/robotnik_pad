@@ -79,6 +79,8 @@ if [ -f "include/robotnik_pad_plugins/movement_plugin.h" ]; then
     # Remove old directory if it's empty
     if [ -d "include/robotnik_pad_plugins" ]; then
         if [ -z "$(ls -A include/robotnik_pad_plugins)" ]; then
+            # Use || true to prevent script termination if rmdir fails due to permissions
+            # This is acceptable since the directory will be cleaned up or can be ignored
             rmdir "include/robotnik_pad_plugins" || true
         fi
     fi
@@ -128,16 +130,23 @@ CPP_FILE="src/${PLUGIN_NAME}_plugin.cpp"
 if [ -f "$CPP_FILE" ]; then
     # Add a print statement at the end of the initialize function
     # We need to find the specific instance in the initialize function, not in other functions
-    # Look for the pattern within the initialize function context
+    # Track brace depth to properly handle nested scopes
     awk -v plugin_class="$PLUGIN_CLASS" '
-        /void.*initialize\(/ { flag=1 }
-        flag && /watchdog_activated_ = false;/ {
+        /void.*initialize\(/ { flag=1; brace_depth=0; next_is_body=1; print; next }
+        flag && next_is_body && /\{/ { next_is_body=0 }
+        flag && /\{/ { brace_depth++ }
+        flag && /\}/ { 
+            brace_depth--
+            if (brace_depth < 0) {
+                flag=0
+            }
+        }
+        flag && /watchdog_activated_ = false;/ && !found {
             print
             print "    RCLCPP_INFO(node_->get_logger(), \"" plugin_class " plugin initialized successfully!\");"
-            flag=0
+            found=1
             next
         }
-        flag && /^}/ { flag=0 }
         { print }
     ' "$CPP_FILE" > "${CPP_FILE}.tmp" && mv "${CPP_FILE}.tmp" "$CPP_FILE"
 fi
