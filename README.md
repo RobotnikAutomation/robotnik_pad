@@ -232,7 +232,7 @@ Build the new package:
 colcon build --packages-select <plugin_name>_pad_plugins
 ```
 
-Add the configuration in config/pad.yaml found in the robotik_pad packages
+Add the configuration in `config/pad.yaml` from the `robotik_pad` package.
 
 ```
 ros__parameters:
