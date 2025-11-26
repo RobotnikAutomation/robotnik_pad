@@ -66,7 +66,7 @@ echo "Renaming files..."
 
 # Convert plugin_name to different formats
 # plugin_name -> PluginName (for class names)
-PLUGIN_CLASS=$(echo "$PLUGIN_NAME" | sed -r 's/(^|_)([a-z])/\U\2/g')
+PLUGIN_CLASS=$(echo "$PLUGIN_NAME" | sed -E 's/(^|_)([a-z])/\U\2/g')
 
 # Find and rename files
 cd "$TARGET_DIR"
@@ -75,7 +75,12 @@ cd "$TARGET_DIR"
 if [ -f "include/robotnik_pad_plugins/movement_plugin.h" ]; then
     mkdir -p "include/${PACKAGE_NAME}"
     mv "include/robotnik_pad_plugins/movement_plugin.h" "include/${PACKAGE_NAME}/${PLUGIN_NAME}_plugin.h"
-    rmdir "include/robotnik_pad_plugins" 2>/dev/null || true
+    # Remove old directory if it's empty
+    if [ -d "include/robotnik_pad_plugins" ]; then
+        if [ -z "$(ls -A include/robotnik_pad_plugins)" ]; then
+            rmdir "include/robotnik_pad_plugins"
+        fi
+    fi
 fi
 
 # Rename source file
@@ -123,7 +128,16 @@ if [ -f "$CPP_FILE" ]; then
     # Add a print statement at the end of the initialize function
     # We need to find the specific instance in the initialize function, not in other functions
     # Look for the pattern within the initialize function context
-    awk '/void.*initialize\(/{flag=1} flag && /watchdog_activated_ = false;/{print; print "    RCLCPP_INFO(node_->get_logger(), \"'"${PLUGIN_CLASS}"' plugin initialized successfully!\");"; flag=0; next} 1' "$CPP_FILE" > "${CPP_FILE}.tmp" && mv "${CPP_FILE}.tmp" "$CPP_FILE"
+    awk -v plugin_class="$PLUGIN_CLASS" '
+        /void.*initialize\(/ { flag=1 }
+        flag && /watchdog_activated_ = false;/ {
+            print
+            print "    RCLCPP_INFO(node_->get_logger(), \"" plugin_class " plugin initialized successfully!\");"
+            flag=0
+            next
+        }
+        { print }
+    ' "$CPP_FILE" > "${CPP_FILE}.tmp" && mv "${CPP_FILE}.tmp" "$CPP_FILE"
 fi
 
 echo ""
