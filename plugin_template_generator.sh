@@ -94,6 +94,13 @@ fi
 # Step 6: Replace content in files
 echo "Replacing content in files..."
 
+# Portable sed function that works on both Linux and macOS
+sed_inplace() {
+    local file="$1"
+    local pattern="$2"
+    sed "$pattern" "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
+}
+
 # Files to process
 FILES_TO_PROCESS=(
     "package.xml"
@@ -106,20 +113,20 @@ FILES_TO_PROCESS=(
 for file in "${FILES_TO_PROCESS[@]}"; do
     if [ -f "$file" ]; then
         # Replace package name (robotnik_pad_plugins -> new_package_name)
-        sed -i "s/robotnik_pad_plugins/${PACKAGE_NAME}/g" "$file"
+        sed_inplace "$file" "s/robotnik_pad_plugins/${PACKAGE_NAME}/g"
         
         # Replace movement with plugin name (lowercase)
-        sed -i "s/movement/${PLUGIN_NAME}/g" "$file"
+        sed_inplace "$file" "s/movement/${PLUGIN_NAME}/g"
         
         # Replace Movement with PluginName (class name format)
-        sed -i "s/Movement/${PLUGIN_CLASS}/g" "$file"
+        sed_inplace "$file" "s/Movement/${PLUGIN_CLASS}/g"
         
         # Replace PadPluginMovement with PadPlugin<PluginName>
-        sed -i "s/PadPluginMovement/PadPlugin${PLUGIN_CLASS}/g" "$file"
+        sed_inplace "$file" "s/PadPluginMovement/PadPlugin${PLUGIN_CLASS}/g"
         
         # Fix the header guard
         HEADER_GUARD=$(echo "PAD_PLUGIN_${PLUGIN_NAME}_H" | tr '[:lower:]' '[:upper:]')
-        sed -i "s/PAD_PLUGIN_MOVEMENT_H/${HEADER_GUARD}/g" "$file"
+        sed_inplace "$file" "s/PAD_PLUGIN_MOVEMENT_H/${HEADER_GUARD}/g"
     fi
 done
 
@@ -132,16 +139,20 @@ if [ -f "$CPP_FILE" ]; then
     # We need to find the specific instance in the initialize function, not in other functions
     # Track brace depth to properly handle nested scopes
     awk -v plugin_class="$PLUGIN_CLASS" '
-        /void.*initialize\(/ { flag=1; brace_depth=0; next_is_body=1; print; next }
-        flag && next_is_body && /\{/ { next_is_body=0 }
-        flag && /\{/ { brace_depth++ }
-        flag && /\}/ { 
+        /void.*initialize\(/ { 
+            in_init=1
+            brace_depth=0
+            print
+            next
+        }
+        in_init && /\{/ { brace_depth++ }
+        in_init && /\}/ { 
             brace_depth--
-            if (brace_depth < 0) {
-                flag=0
+            if (brace_depth == 0) {
+                in_init=0
             }
         }
-        flag && /watchdog_activated_ = false;/ && !found {
+        in_init && /watchdog_activated_ = false;/ && !found {
             print
             print "    RCLCPP_INFO(node_->get_logger(), \"" plugin_class " plugin initialized successfully!\");"
             found=1
