@@ -25,6 +25,7 @@
   <exec_depend>pluginlib</exec_depend>
   <exec_depend>robotnik_pad</exec_depend>
   <exec_depend>robotnik_pad_msgs</exec_depend>
+  <exec_depend>actionlib</exec_depend>
 
 
 
