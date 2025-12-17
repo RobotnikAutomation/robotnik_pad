@@ -22,7 +22,7 @@ void PadPluginElevatorAction::initialize(const ros::NodeHandle& nh, const std::s
   readParam(pnh_, "elevator_action_ns", elevator_action_ns_, elevator_action_ns_, required);
   readParam(pnh_, "stop_elevator", stop_elevator_, false, not_required);
   readParam(pnh_, "stop_elevator_dead_man", stop_elevator_dead_man_, false, not_required);
-  // Service client
+  // Actionlib action client
   elevator_action_client_ = std::make_shared
       <actionlib::SimpleActionClient<robotnik_msgs::SetElevatorAction>>(nh_, elevator_action_ns_, true);
 
