@@ -50,7 +50,7 @@ void PadPluginElevatorAction::execute(const std::vector<Button>& buttons, std::v
 
     if (stop_elevator_)
     {
-      if (axes[axis_elevator_] > -0.1 && axes[axis_elevator_] < 0.1 && elevator_is_running_ == true)
+      if (axes[axis_elevator_] > -0.1 && axes[axis_elevator_] < 0.1 && elevator_is_running_)
       {
         elevator_is_running_ = !sendGoal(robotnik_msgs::ElevatorAction::STOP);
       }
