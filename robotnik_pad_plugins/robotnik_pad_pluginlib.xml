@@ -20,4 +20,7 @@
     <class name="robotnik_pad_plugins/BlkArc" type="pad_plugins::PadPluginBlkArc" base_class_type="pad_plugins::GenericPadPlugin">
         <description>This is the BLK ARC plugin.</description>
     </class>
+    <class name="robotnik_pad_plugins/ElevatorAction" type="pad_plugins::PadPluginElevatorAction" base_class_type="pad_plugins::GenericPadPlugin">
+        <description>This is the Pad elevator action plugin.</description>
+    </class>
 </library>
