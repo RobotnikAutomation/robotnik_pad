@@ -11,6 +11,9 @@ find_package(rclcpp REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(robotnik_pad REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(robotnik_navigation_msgs REQUIRED)
+find_package(action_msgs REQUIRED)
 
 include_directories(${robotnik_pad_INCLUDE_DIRS})
 
@@ -26,6 +29,9 @@ ament_target_dependencies(${PROJECT_NAME}
   pluginlib
   geometry_msgs
   robotnik_pad
+  rclcpp_action
+  robotnik_navigation_msgs
+  action_msgs
 )
 
 #target_include_directories(${PROJECT_NAME} PRIVATE
