@@ -8,6 +8,7 @@
       joy_timeout: 1.0
     plugins:
       - Movement
+      - Charge
     
     Movement:
       type: robotnik_pad_plugins/Movement
@@ -25,3 +26,19 @@
         use_accel_watchdog: true
         axis_watchdog: [6,7,8]
         watchdog_duration: 0.5
+
+    Charge:
+      type: robotnik_pad_plugins/Charge
+      config:
+        button_deadman: 5
+        button_charge: 0
+        button_uncharge: 2
+      charge:
+        action_name: charge
+        robot_dock_frame: robot_base_docking_contact
+        dock_frame: robotnik_marker_1
+        dock_offset: 0.1
+        retries: 3
+      uncharge:
+        action_name: uncharge
+      action_timeout: 400.0
