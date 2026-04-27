@@ -68,6 +68,13 @@ void PadPluginCharge::execute(const std::vector<Button>& buttons, std::vector<Ax
         {
             stopAction();
         }
+
+        if (buttons[button_charge_].isReleased() || 
+            buttons[button_uncharge_].isReleased())
+        {
+            stopAction();
+        }
+
         return;
     }
 
@@ -178,6 +185,8 @@ void PadPluginCharge::unchargeResultCallback(const GoalHandleUncharge::WrappedRe
 
 void PadPluginCharge::sendChargeGoal()
 {
+    RCLCPP_INFO(node_->get_logger(), "PadPluginCharge::sendChargeGoal: Charge action requested");
+
     if (!charge_action_client_->wait_for_action_server(std::chrono::seconds(5)))
     {
         RCLCPP_ERROR(node_->get_logger(), "PadPluginCharge::sendChargeGoal: Action server not available after waiting");
@@ -190,6 +199,8 @@ void PadPluginCharge::sendChargeGoal()
 
 void PadPluginCharge::sendUnchargeGoal()
 {
+    RCLCPP_INFO(node_->get_logger(), "PadPluginCharge::sendUnchargeGoal: Uncharge action requested");
+
     if (!uncharge_action_client_->wait_for_action_server(std::chrono::seconds(5)))
     {
         RCLCPP_ERROR(node_->get_logger(), "PadPluginCharge::sendUnchargeGoal: Action server not available after waiting");
@@ -213,6 +224,8 @@ bool PadPluginCharge::isActionTimedOut()
 
 void PadPluginCharge::stopAction()
 {
+    RCLCPP_INFO(node_->get_logger(), "PadPluginCharge::stopAction: Stop charge/uncharge action requested");
+
     if (action_running_)
     {
         // Cancel charge goal if we have one
@@ -241,6 +254,7 @@ void PadPluginCharge::stopAction()
         }
 
         action_running_ = false;
+        RCLCPP_INFO(node_->get_logger(), "PadPluginCharge::stopAction: Charge/uncharge action stopped");
     }
 }
 
