@@ -101,19 +101,31 @@ Available plugins:
 * ~**max_angular_speed** (double, default: 1.5): Maximum angular speed that can be sent to the controller based on the current velocity level (0.1->1) and the current axis_angular_z value (0->1).
 * ~**cmd_topic_vel** (string, default: cmd_vel): Name of topic where the command vel is being published.
 * ~**wheel_base** (double, default: 0): Distance between the front axle and the rear axle of the vehicle. If set to 0, ackermann kinematics will not be taken into account when kinematics are changed.
-* ~**config/button_deadman** (int, default: 5): Button number to enable any command sent to the controller.
-* ~**config/button_speed_up** (int, default: 3): Button number to increase the current velocity level applied to the max_speed params.
-* ~**config/button_speed_down** (int, default: 1): Button number to decrease the current velocity level applied to the max_speed params.
-* ~**config/button_kinematic_mode** (int, default: 6) Button number to switch between kinematic modes: diff, omni and ackermann.
-* ~**config/axis_linear_x** (int, default: 1): Axis number to set the linear x speed.
-* ~**config/axis_linear_y** (int, default: 0): Axis number to set the linear y speed.
-* ~**config/axis_angular_z** (int, default: 2) Axis number to set the angular speed.
-* ~**config/use_accel_watchdog** (bool, default: true): Flag to check if any of the defined watchdog axes is changing its value in order to keep publishing velocity commands.
-* ~**config/watchdog_duration** (double, default: 0.5): Time in seconds the node will wait without receiving changes in the watchdog axes before stopping publishing velocity commands.
-* ~**config/axis_watchdog** (list of ints, default: [8]): Axes used to monitor that the joy is updating buttons and axes. The defined axes should correspond to the accelerometers of the pad.
+* ~**config.button_deadman** (int, default: 5): Button number to enable any command sent to the controller.
+* ~**config.button_speed_up** (int, default: 3): Button number to increase the current velocity level applied to the max_speed params.
+* ~**config.button_speed_down** (int, default: 1): Button number to decrease the current velocity level applied to the max_speed params.
+* ~**config.button_kinematic_mode** (int, default: 6) Button number to switch between kinematic modes: diff, omni and ackermann.
+* ~**config.axis_linear_x** (int, default: 1): Axis number to set the linear x speed.
+* ~**config.axis_linear_y** (int, default: 0): Axis number to set the linear y speed.
+* ~**config.axis_angular_z** (int, default: 2) Axis number to set the angular speed.
+* ~**config.use_accel_watchdog** (bool, default: true): Flag to check if any of the defined watchdog axes is changing its value in order to keep publishing velocity commands.
+* ~**config.watchdog_duration** (double, default: 0.5): Time in seconds the node will wait without receiving changes in the watchdog axes before stopping publishing velocity commands.
+* ~**config.axis_watchdog** (list of ints, default: [8]): Axes used to monitor that the joy is updating buttons and axes. The defined axes should correspond to the accelerometers of the pad.
+
+#### 1.1.2.2. Charge plugin
+* ~**config.button_deadman** (int, default: 5): Button number to enable any command sent to the controller.
+* ~**config.button_charge** (int, default: 0): Button number to send the charge action goal.
+* ~**config.button_uncharge** (int, default: 2): Button number to send the uncharge action goal.
+* ~**charge.robot_dock_frame** (string, default: robot_base_docking_contact): Frame used as the robot docking contact.
+* ~**charge.dock_frame** (string, default: robotnik_marker_1): Frame used as the docking station reference.
+* ~**charge.dock_offset** (double, default: 0.1): Offset applied to the docking goal.
+* ~**charge.retries** (int, default: 3): Number of retries for the charge action.
+* ~**charge.action_name** (string, default: charge): Name of the charge action server.
+* ~**uncharge.action_name** (string, default: uncharge): Name of the uncharge action server.
+* ~**action_timeout** (double, default: 300.0): Timeout in seconds to cancel a running action.
 
 ### 1.1.3. Configuration example
-This an example of a config file loading a single plugin:
+This an example of a config file loading multiple plugins:
 
 ```yaml
 /**:
@@ -121,6 +133,7 @@ This an example of a config file loading a single plugin:
 
     plugins:
       - Movement
+      - Charge
 
     desired_freq: 10.0
 
@@ -147,6 +160,22 @@ This an example of a config file loading a single plugin:
         axis_watchdog: [6,7,8]
         watchdog_duration: 0.5
 
+    Charge:
+      type: robotnik_pad_plugins/Charge
+      config:
+        button_deadman: 5
+        button_charge: 0
+        button_uncharge: 2
+      charge:
+        action_name: charge
+        robot_dock_frame: robot_base_docking_contact
+        dock_frame: robotnik_marker_1
+        dock_offset: 0.1
+        retries: 3
+      uncharge:
+        action_name: uncharge
+      action_timeout: 400.0
+
 ```
 First of all you need to define a list containing the different plugins you want to load. Then, for each of the plugins you want to load, you should specify its parameters.
 
@@ -157,6 +186,9 @@ First of all you need to define a list containing the different plugins you want
 ### 1.3.1. Plugin published topics
 #### 1.3.1.1. Movement
 * **cmd_topic_vel** ([geometry_msgs/msg/Twist](https://docs.ros2.org/foxy/api/geometry_msgs/msg/Twist.html)): Sends the velocity references to defined topic.
+
+#### 1.3.1.2. Charge
+None
 
 ## 1.4. Services
 
@@ -171,8 +203,10 @@ None
 None
 
 ## 1.7. Action clients called
-
-None
+### 1.7.1. Plugin action clients called
+#### 1.7.1.1. Charge
+* **charge.action_name** ([robotnik_navigation_msgs/action/Charge](https://github.com/RobotnikAutomation/robotnik_navigation_msgs)): Action server to start charging.
+* **uncharge.action_name** ([robotnik_navigation_msgs/action/Uncharge](https://github.com/RobotnikAutomation/robotnik_navigation_msgs)): Action server to stop charging.
 
 ## 1.8. Required tf Transforms
 
