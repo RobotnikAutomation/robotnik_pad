@@ -62,6 +62,8 @@ void PadPluginCharge::execute(const std::vector<Button>& buttons, std::vector<Ax
         return;
     }
 
+    const bool deadman_pressed = buttons[button_deadman_].isPressed();
+
     if (action_running_)
     {
         if (isActionTimedOut())
@@ -69,8 +71,9 @@ void PadPluginCharge::execute(const std::vector<Button>& buttons, std::vector<Ax
             stopAction();
         }
 
-        if (buttons[button_charge_].isReleased() || 
-            buttons[button_uncharge_].isReleased())
+        if (deadman_pressed &&
+            (buttons[button_charge_].isReleased() ||
+             buttons[button_uncharge_].isReleased()))
         {
             stopAction();
         }
@@ -78,7 +81,7 @@ void PadPluginCharge::execute(const std::vector<Button>& buttons, std::vector<Ax
         return;
     }
 
-    if (buttons[button_deadman_].isReleased())
+    if (!deadman_pressed)
     {
         return;
     }
