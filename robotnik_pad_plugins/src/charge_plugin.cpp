@@ -84,14 +84,16 @@ void PadPluginCharge::execute(const std::vector<Button>& buttons, std::vector<Ax
         return;
     }
 
-    if (buttons[button_charge_].isReleased() && buttons[button_deadman_].isPressed())
+    if (buttons[button_deadman_].isPressed())
     {
-        sendChargeGoal();
-    }
-
-    else if(buttons[button_uncharge_].isReleased() && buttons[button_deadman_].isPressed())
-    {
-        sendUnchargeGoal();
+        if (buttons[button_charge_].isReleased())
+        {
+            sendChargeGoal();
+        }
+        else if (buttons[button_uncharge_].isReleased())
+        {
+            sendUnchargeGoal();
+        }
     }
 }
 
