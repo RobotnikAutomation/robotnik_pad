@@ -10,9 +10,10 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(pluginlib REQUIRED)
-
+find_package(ps5_pad_driver REQUIRED)
+	
 add_executable(robotnik_pad src/robotnik_pad_node.cpp src/robotnik_pad.cpp)
-ament_target_dependencies(robotnik_pad rclcpp sensor_msgs pluginlib)
+ament_target_dependencies(robotnik_pad rclcpp sensor_msgs pluginlib ps5_pad_driver)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
