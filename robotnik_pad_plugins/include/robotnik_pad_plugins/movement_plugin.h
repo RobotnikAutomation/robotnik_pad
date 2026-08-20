@@ -39,6 +39,7 @@ protected:
     void checkWatchdog(std::vector<Axes>& axes);
 
     uint8_t button_deadman_;
+    uint8_t button_unsafe_;
     uint8_t axis_linear_x_;
     uint8_t axis_linear_y_;
     uint8_t axis_angular_z_;    
@@ -48,6 +49,7 @@ protected:
     double max_linear_speed_;
     double max_angular_speed_;
     std::string cmd_topic_vel_;
+    std::string cmd_topic_vel_unsafe_;
     bool use_accel_watchdog_;
     double watchdog_duration_;
     double wheel_base_;
@@ -55,6 +57,7 @@ protected:
     std::vector<int64_t> axis_accel_watchdog_;
 
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr twist_pub_;
+    rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr twist_unsafe_pub_;
 
     double current_velocity_level_;
     double velocity_level_step_;

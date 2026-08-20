@@ -15,8 +15,10 @@
       max_linear_speed: 1.0
       max_angular_speed: 1.5
       cmd_topic_vel: pad_teleop/cmd_vel
+      cmd_topic_vel_unsafe: pad_teleop/unsafe
       config:
         button_deadman: 5
+        button_unsafe: 6
         axis_linear_x: 1
         axis_linear_y: 0
         axis_angular_z: 2

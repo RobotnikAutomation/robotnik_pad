@@ -16,6 +16,7 @@ void PadPluginMovement::initialize(const rclcpp::Node::SharedPtr& node, const st
     readParams(plugin_ns);
 
     twist_pub_ = node_->create_publisher<geometry_msgs::msg::Twist>(cmd_topic_vel_, 10);
+    twist_unsafe_pub_ = node_->create_publisher<geometry_msgs::msg::Twist>(cmd_topic_vel_unsafe_, 10);
 
     current_velocity_level_ = 0.1;
     velocity_level_step_ = 0.1;
@@ -72,7 +73,14 @@ void PadPluginMovement::execute(const std::vector<Button>& buttons, std::vector<
         }
 
         setSpeed(axes);
-        twist_pub_->publish(cmd_twist_);
+        if (buttons[button_unsafe_].isPressed())
+        {
+            twist_unsafe_pub_->publish(cmd_twist_);
+        }
+        else
+        {
+            twist_pub_->publish(cmd_twist_);
+        }
     }
 }
 
@@ -183,6 +191,8 @@ void PadPluginMovement::readParams(const std::string ns)
 {   
     button_deadman_ = 5;
     readParam(node_, ns + ".config.button_deadman", button_deadman_, button_deadman_, true);
+    button_unsafe_ = 6;
+    readParam(node_, ns + ".config.button_unsafe", button_unsafe_, button_unsafe_, true);
     axis_linear_x_ = 1;
     readParam(node_, ns + ".config.axis_linear_x", axis_linear_x_, axis_linear_x_, true);
     axis_linear_y_ = 0;
@@ -201,6 +211,8 @@ void PadPluginMovement::readParams(const std::string ns)
     readParam(node_, ns + ".max_angular_speed", max_angular_speed_, max_angular_speed_, true);
     cmd_topic_vel_ = "cmd_vel";
     readParam(node_, ns + ".cmd_topic_vel", cmd_topic_vel_, cmd_topic_vel_, true);
+    cmd_topic_vel_unsafe_ = "unsafe";
+    readParam(node_, ns + ".cmd_topic_vel_unsafe", cmd_topic_vel_unsafe_, cmd_topic_vel_unsafe_, true);
     use_accel_watchdog_ = true;
     readParam(node_, ns + ".config.use_accel_watchdog", use_accel_watchdog_, use_accel_watchdog_, true);
     watchdog_duration_ = 0.5;
@@ -220,6 +232,7 @@ void PadPluginMovement::stopRobot()
     cmd_twist_.linear.y = 0.0;
     cmd_twist_.angular.z = 0.0;
     twist_pub_->publish(cmd_twist_);
+    twist_unsafe_pub_->publish(cmd_twist_);
 }
 
 } // namespace pad_plugins
