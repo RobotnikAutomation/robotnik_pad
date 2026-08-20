@@ -211,7 +211,7 @@ void PadPluginMovement::readParams(const std::string ns)
     readParam(node_, ns + ".max_angular_speed", max_angular_speed_, max_angular_speed_, true);
     cmd_topic_vel_ = "cmd_vel";
     readParam(node_, ns + ".cmd_topic_vel", cmd_topic_vel_, cmd_topic_vel_, true);
-    cmd_topic_vel_unsafe_ = "unsafe";
+    cmd_topic_vel_unsafe_ = "cmd_vel_unsafe";
     readParam(node_, ns + ".cmd_topic_vel_unsafe", cmd_topic_vel_unsafe_, cmd_topic_vel_unsafe_, true);
     use_accel_watchdog_ = true;
     readParam(node_, ns + ".config.use_accel_watchdog", use_accel_watchdog_, use_accel_watchdog_, true);
